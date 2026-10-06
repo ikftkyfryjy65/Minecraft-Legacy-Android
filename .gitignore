@@ -1,0 +1,8 @@
+*.so
+*.apk
+*.arc
+*.zip
+build*/
+repack*/
+*.o
+*.a
