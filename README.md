@@ -15,9 +15,9 @@
 
 ## The Story
 
-On **October 5, 2026**, I started working on porting the original `libMinecraft.Client.so` binary from PS3 to Android ARM64.
+On **October 3, 2026**, I started working on porting the original `libMinecraft.Client.so` binary from PS3 to Android ARM64.
 
-**4 days later:**
+**3 days later (October 6, 2026):**
 
 - Built a complete APK that installs and runs on Android 16
 - Extracted all assets (670 files) from `MediaPS3.arc`
