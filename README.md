@@ -95,6 +95,10 @@ The project **[anhot11/LegacyMCPE](https://github.com/anhot11/LegacyMCPE)** (a f
 
 ---
 
+لا إله إلا الله محمد رسول الله
+
+---
+
 **Date:** 2026-10-06
 **Location:** Iraq
 **By:** ikftkyfryjy65
