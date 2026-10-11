@@ -46,6 +46,12 @@ jobs:
       - name: Build Minecraft.World
         run: cmake --build "$GITHUB_WORKSPACE/build-android" --target Minecraft.World -j2
 
+      - name: Stage Minecraft.World archive for Client
+        run: |
+          world_archive="$(find "$GITHUB_WORKSPACE/build-android" -type f -name 'Minecraft.World.a' -print -quit)"
+          test -n "$world_archive"
+          cp "$world_archive" "$GITHUB_WORKSPACE/build-android/libMinecraft.World.a"
+
       - name: Build Minecraft.Client
         run: cmake --build "$GITHUB_WORKSPACE/build-android" --target Minecraft.Client -j2
 
