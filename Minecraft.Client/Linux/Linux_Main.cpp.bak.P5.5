@@ -1,0 +1,21 @@
+/* Linux/Android — entry point.
+ * Phase 4: minimal — just verifies binary loads.
+ * Phase 5+: real init + game loop. */
+
+#include <cstdio>
+#include <cstdlib>
+
+extern int MineCraftMain(int argc, char** argv);
+
+int main(int argc, char** argv) {
+    printf("[Minecraft LCE] Linux/Android entry point\n");
+    printf("[Minecraft LCE] argc=%d\n", argc);
+    return MineCraftMain(argc, argv);
+}
+
+/* Minimal game main stub — Phase 5+ real implementation */
+int MineCraftMain(int /*argc*/, char** /*argv*/) {
+    printf("[Minecraft LCE] MineCraftMain — starting\n");
+    printf("[Minecraft LCE] Binary runs! (no game loop yet)\n");
+    return 0;
+}

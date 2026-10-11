@@ -1,0 +1,27 @@
+#ifndef MOCK_XRNM_H
+#define MOCK_XRNM_H
+
+/* Minimal stub for Xbox 360 XRNM (Xbox Live Rich Network Module).
+ * Provides the declarations used by Minecraft.World/Socket.cpp.
+ * Real networking is not implemented — Phase 8 work. */
+
+class INetworkPlayer {
+public:
+    INetworkPlayer() {}
+    virtual ~INetworkPlayer() {}
+
+    virtual unsigned char GetSmallId() const { return 0; }
+    virtual void SendData(INetworkPlayer* /*target*/,
+                          const void*    /*data*/,
+                          unsigned int   /*size*/,
+                          unsigned int   /*flags*/) {}
+    virtual bool IsHost()  const { return false; }
+    virtual bool IsLocal() const { return false; }
+};
+
+struct XRNM_SEND_BUFFER {
+    unsigned char* pbyData;
+    unsigned int   dwDataSize;
+};
+
+#endif /* MOCK_XRNM_H */

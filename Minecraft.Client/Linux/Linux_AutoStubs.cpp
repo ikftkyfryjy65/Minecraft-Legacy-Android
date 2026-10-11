@@ -1,0 +1,1259 @@
+/* AUTO-GENERATED stubs — safe fallback before arena init */
+#include <sys/mman.h>
+
+static void* __mce_fake_vtable[8192];
+static unsigned char* __mce_arena = nullptr;
+static unsigned char __mce_fallback[16384] __attribute__((aligned(16)));
+
+extern "C" void* __mce_null_method();
+
+static inline void* __mce_obj(size_t idx) {
+    if (!__mce_arena) {
+        *(void**)__mce_fallback = __mce_fake_vtable;
+        return __mce_fallback;
+    }
+    unsigned char* p = __mce_arena + (idx % 16384) * 16384;
+    *(void**)p = __mce_fake_vtable;
+    return p;
+}
+
+/* ctor 101: vtable setup + fallback patching (very early) */
+__attribute__((constructor(101)))
+static void __mce_vtable_init() {
+    for (int i = 0; i < 8192; i++)
+        __mce_fake_vtable[i] = (void*)&__mce_null_method;
+    *(void**)__mce_fallback = __mce_fake_vtable;
+}
+
+/* ctor 102: mmap arena */
+__attribute__((constructor(102)))
+static void __mce_arena_init() {
+    __mce_arena = (unsigned char*)mmap(nullptr, 256*1024*1024,
+        PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS|MAP_NORESERVE, -1, 0);
+}
+
+extern "C" void* __mce_null_method() { return __mce_obj(0); }
+
+/* CloseHandle(void*) */
+extern "C"  void* __f_0(...) asm("_Z11CloseHandlePv");
+ void* __f_0(...) { return __mce_obj(0); }
+
+/* EnterCriticalSection(_CRITICAL_SECTION*) */
+extern "C"  void* __f_1(...) asm("_Z20EnterCriticalSectionP17_CRITICAL_SECTION");
+ void* __f_1(...) { return __mce_obj(1); }
+
+/* LeaveCriticalSection(_CRITICAL_SECTION*) */
+extern "C"  void* __f_2(...) asm("_Z20LeaveCriticalSectionP17_CRITICAL_SECTION");
+ void* __f_2(...) { return __mce_obj(2); }
+
+/* DeleteCriticalSection(_CRITICAL_SECTION*) */
+extern "C"  void* __f_3(...) asm("_Z21DeleteCriticalSectionP17_CRITICAL_SECTION");
+ void* __f_3(...) { return __mce_obj(3); }
+
+/* TryEnterCriticalSection(_CRITICAL_SECTION*) */
+extern "C"  void* __f_4(...) asm("_Z23TryEnterCriticalSectionP17_CRITICAL_SECTION");
+ void* __f_4(...) { return __mce_obj(4); }
+
+/* InitializeCriticalSectionAndSpinCount(_CRITICAL_SECTION*, unsigned int) */
+extern "C"  void* __f_5(...) asm("_Z37InitializeCriticalSectionAndSpinCountP17_CRITICAL_SECTIONj");
+ void* __f_5(...) { return __mce_obj(5); }
+
+/* Sleep(unsigned int) */
+extern "C"  void* __f_6(...) asm("_Z5Sleepj");
+ void* __f_6(...) { return __mce_obj(6); }
+
+/* MemSect(int) */
+extern "C"  void* __f_7(...) asm("_Z7MemSecti");
+ void* __f_7(...) { return __mce_obj(7); }
+
+/* C4JStorage::GetInstalledDLC(int, int (*)(void*, int, int), void*) */
+extern "C"  void* __f_8(...) asm("_ZN10C4JStorage15GetInstalledDLCEiPFiPviiES0_");
+ void* __f_8(...) { return __mce_obj(8); }
+
+/* C4JStorage::GetSaveDisabled() */
+extern "C"  void* __f_9(...) asm("_ZN10C4JStorage15GetSaveDisabledEv");
+ void* __f_9(...) { return __mce_obj(9); }
+
+/* C4JStorage::ReadFromProfile(int, int) */
+extern "C"  void* __f_10(...) asm("_ZN10C4JStorage15ReadFromProfileEii");
+ void* __f_10(...) { return __mce_obj(10); }
+
+/* C4JStorage::SetSaveDisabled(bool) */
+extern "C"  void* __f_11(...) asm("_ZN10C4JStorage15SetSaveDisabledEb");
+ void* __f_11(...) { return __mce_obj(11); }
+
+/* C4JStorage::MountInstalledDLC(int, unsigned int, int (*)(void*, int, unsigned int, unsigned int), void*, char const*) */
+extern "C"  void* __f_12(...) asm("_ZN10C4JStorage17MountInstalledDLCEijPFiPvijjES0_PKc");
+ void* __f_12(...) { return __mce_obj(12); }
+
+/* C4JStorage::UnmountInstalledDLC(char const*) */
+extern "C"  void* __f_13(...) asm("_ZN10C4JStorage19UnmountInstalledDLCEPKc");
+ void* __f_13(...) { return __mce_obj(13); }
+
+/* C4JStorage::GetMountedDLCFileList(char const*, std::__ndk1::vector<std::__ndk1::basic_string<char, std::__ndk1::char_traits<char>, std::__ndk1::allocator<char>>, std::__ndk1::allocator<std::__ndk1::basic_string<char, std::__ndk1::char_traits<char>, std::__ndk1::allocator<char>>>>&) */
+extern "C"  void* __f_14(...) asm("_ZN10C4JStorage21GetMountedDLCFileListEPKcRNSt6__ndk16vectorINS2_12basic_stringIcNS2_11char_traitsIcEENS2_9allocatorIcEEEENS7_IS9_EEEE");
+ void* __f_14(...) { return __mce_obj(14); }
+
+/* C4JStorage::GetSaveUniqueFilename(char*) */
+extern "C"  void* __f_15(...) asm("_ZN10C4JStorage21GetSaveUniqueFilenameEPc");
+ void* __f_15(...) { return __mce_obj(15); }
+
+/* C4JStorage::SetSaveDeviceSelected(unsigned int, bool) */
+extern "C"  void* __f_16(...) asm("_ZN10C4JStorage21SetSaveDeviceSelectedEjb");
+ void* __f_16(...) { return __mce_obj(16); }
+
+/* C4JStorage::C4JStorage() */
+extern "C"  void* __f_17(...) asm("_ZN10C4JStorageC1Ev");
+ void* __f_17(...) { return __mce_obj(17); }
+
+/* SoundEngine::SetStreamingSounds(int, int, int, int, int, int, int) */
+extern "C"  void* __f_18(...) asm("_ZN11SoundEngine18SetStreamingSoundsEiiiiiii");
+ void* __f_18(...) { return __mce_obj(18); }
+
+/* SoundEngine::SoundEngine() */
+/* TEMP STUB: SoundEngine ctor writes fake vtable into this */
+extern "C" void __f_19(void* self) asm("_ZN11SoundEngineC1Ev");
+void __f_19(void* self) { *(void**)self = (void*)__mce_fake_vtable; }
+
+/* StatsCounter::getTotalValue(Stat*) */
+extern "C"  void* __f_20(...) asm("_ZN12StatsCounter13getTotalValueEP4Stat");
+ void* __f_20(...) { return __mce_obj(20); }
+
+/* StatsCounter::setupStatBoards() */
+extern "C"  void* __f_21(...) asm("_ZN12StatsCounter15setupStatBoardsEv");
+ void* __f_21(...) { return __mce_obj(21); }
+
+/* StatsCounter::saveLeaderboards() */
+extern "C"  void* __f_22(...) asm("_ZN12StatsCounter16saveLeaderboardsEv");
+ void* __f_22(...) { return __mce_obj(22); }
+
+/* StatsCounter::save(int, bool) */
+extern "C"  void* __f_23(...) asm("_ZN12StatsCounter4saveEib");
+ void* __f_23(...) { return __mce_obj(23); }
+
+/* StatsCounter::tick(int) */
+extern "C"  void* __f_24(...) asm("_ZN12StatsCounter4tickEi");
+ void* __f_24(...) { return __mce_obj(24); }
+
+/* StatsCounter::award(Stat*, unsigned int, unsigned int) */
+extern "C"  void* __f_25(...) asm("_ZN12StatsCounter5awardEP4Statjj");
+ void* __f_25(...) { return __mce_obj(25); }
+
+/* StatsCounter::clear() */
+extern "C"  void* __f_26(...) asm("_ZN12StatsCounter5clearEv");
+ void* __f_26(...) { return __mce_obj(26); }
+
+/* StatsCounter::StatsCounter() */
+extern "C"  void* __f_27(...) asm("_ZN12StatsCounterC1Ev");
+ void* __f_27(...) { return __mce_obj(27); }
+
+/* UIController::ReloadSkin() */
+extern "C"  void* __f_28(...) asm("_ZN12UIController10ReloadSkinEv");
+ void* __f_28(...) { return __mce_obj(28); }
+
+/* UIController::GetTopScene(int, EUILayer, EUIGroup) */
+extern "C"  void* __f_29(...) asm("_ZN12UIController11GetTopSceneEi8EUILayer8EUIGroup");
+ void* __f_29(...) { return __mce_obj(29); }
+
+/* UIController::SetTutorial(int, Tutorial*) */
+extern "C"  void* __f_30(...) asm("_ZN12UIController11SetTutorialEiP8Tutorial");
+ void* __f_30(...) { return __mce_obj(30); }
+
+/* UIController::ShowTooltip(unsigned int, unsigned int, bool) */
+extern "C"  void* __f_31(...) asm("_ZN12UIController11ShowTooltipEjjb");
+ void* __f_31(...) { return __mce_obj(31); }
+
+/* UIController::EnableTooltip(unsigned int, unsigned int, bool) */
+extern "C"  void* __f_32(...) asm("_ZN12UIController13EnableTooltipEjjb");
+ void* __f_32(...) { return __mce_obj(32); }
+
+/* UIController::HandleGameTick() */
+extern "C"  void* __f_33(...) asm("_ZN12UIController14HandleGameTickEv");
+ void* __f_33(...) { return __mce_obj(33); }
+
+/* UIController::HidePressStart() */
+extern "C"  void* __f_34(...) asm("_ZN12UIController14HidePressStartEv");
+ void* __f_34(...) { return __mce_obj(34); }
+
+/* UIController::SetTooltipText(unsigned int, unsigned int, int) */
+extern "C"  void* __f_35(...) asm("_ZN12UIController14SetTooltipTextEjji");
+ void* __f_35(...) { return __mce_obj(35); }
+
+/* UIController::ShowPressStart(unsigned int) */
+extern "C"  void* __f_36(...) asm("_ZN12UIController14ShowPressStartEj");
+ void* __f_36(...) { return __mce_obj(36); }
+
+/* UIController::ShowTrialTimer(bool) */
+extern "C"  void* __f_37(...) asm("_ZN12UIController14ShowTrialTimerEb");
+ void* __f_37(...) { return __mce_obj(37); }
+
+/* UIController::logDebugString(std::__ndk1::basic_string<char, std::__ndk1::char_traits<char>, std::__ndk1::allocator<char>> const&) */
+extern "C"  void* __f_38(...) asm("_ZN12UIController14logDebugStringERKNSt6__ndk112basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEE");
+ void* __f_38(...) { return __mce_obj(38); }
+
+/* UIController::AnimateKeyPress(int, int, bool, bool, bool) */
+extern "C"  void* __f_39(...) asm("_ZN12UIController15AnimateKeyPressEiibbb");
+ void* __f_39(...) { return __mce_obj(39); }
+
+/* UIController::IsReloadingSkin() */
+extern "C"  void* __f_40(...) asm("_ZN12UIController15IsReloadingSkinEv");
+ void* __f_40(...) { return __mce_obj(40); }
+
+/* UIController::SetSelectedItem(unsigned int, std::__ndk1::basic_string<wchar_t, std::__ndk1::char_traits<wchar_t>, std::__ndk1::allocator<wchar_t>> const&) */
+extern "C"  void* __f_41(...) asm("_ZN12UIController15SetSelectedItemEjRKNSt6__ndk112basic_stringIwNS0_11char_traitsIwEENS0_9allocatorIwEEEE");
+ void* __f_41(...) { return __mce_obj(41); }
+
+/* UIController::SetWinUserIndex(unsigned int) */
+extern "C"  void* __f_42(...) asm("_ZN12UIController15SetWinUserIndexEj");
+ void* __f_42(...) { return __mce_obj(42); }
+
+/* UIController::UpdateTrialTimer(unsigned int) */
+extern "C"  void* __f_43(...) asm("_ZN12UIController16UpdateTrialTimerEj");
+ void* __f_43(...) { return __mce_obj(43); }
+
+/* UIController::CleanUpSkinReload() */
+extern "C"  void* __f_44(...) asm("_ZN12UIController17CleanUpSkinReloadEv");
+ void* __f_44(...) { return __mce_obj(44); }
+
+/* UIController::IsTutorialVisible(int) */
+extern "C"  void* __f_45(...) asm("_ZN12UIController17IsTutorialVisibleEi");
+ void* __f_45(...) { return __mce_obj(45); }
+
+/* UIController::PressStartPlaying(unsigned int) */
+extern "C"  void* __f_46(...) asm("_ZN12UIController17PressStartPlayingEj");
+ void* __f_46(...) { return __mce_obj(46); }
+
+/* UIController::RequestMessageBox(unsigned int, unsigned int, unsigned int*, unsigned int, unsigned int, int (*)(void*, int, C4JStorage::EMessageResult), void*, C4JStringTable*, wchar_t*, unsigned int, bool) */
+extern "C"  void* __f_47(...) asm("_ZN12UIController17RequestMessageBoxEjjPjjjPFiPviN10C4JStorage14EMessageResultEES1_P14C4JStringTablePwjb");
+ void* __f_47(...) { return __mce_obj(47); }
+
+/* UIController::CheckMenuDisplayed() */
+extern "C"  void* __f_48(...) asm("_ZN12UIController18CheckMenuDisplayedEv");
+ void* __f_48(...) { return __mce_obj(48); }
+
+/* UIController::HandleDLCInstalled(int) */
+extern "C"  void* __f_49(...) asm("_ZN12UIController18HandleDLCInstalledEi");
+ void* __f_49(...) { return __mce_obj(49); }
+
+/* UIController::NavigateToHomeMenu() */
+extern "C"  void* __f_50(...) asm("_ZN12UIController18NavigateToHomeMenuEv");
+ void* __f_50(...) { return __mce_obj(50); }
+
+/* UIController::SetTutorialVisible(int, bool) */
+extern "C"  void* __f_51(...) asm("_ZN12UIController18SetTutorialVisibleEib");
+ void* __f_51(...) { return __mce_obj(51); }
+
+/* UIController::ShowUIDebugConsole(bool) */
+extern "C"  void* __f_52(...) asm("_ZN12UIController18ShowUIDebugConsoleEb");
+ void* __f_52(...) { return __mce_obj(52); }
+
+/* UIController::IsPauseMenuDisplayed(int) */
+extern "C"  void* __f_53(...) asm("_ZN12UIController20IsPauseMenuDisplayedEi");
+ void* __f_53(...) { return __mce_obj(53); }
+
+/* UIController::SetEmptyQuadrantLogo(int) */
+extern "C"  void* __f_54(...) asm("_ZN12UIController20SetEmptyQuadrantLogoEi");
+ void* __f_54(...) { return __mce_obj(54); }
+
+/* UIController::ReduceTrialTimerValue() */
+extern "C"  void* __f_55(...) asm("_ZN12UIController21ReduceTrialTimerValueEv");
+ void* __f_55(...) { return __mce_obj(55); }
+
+/* UIController::ShowPlayerDisplayname(bool) */
+extern "C"  void* __f_56(...) asm("_ZN12UIController21ShowPlayerDisplaynameEb");
+ void* __f_56(...) { return __mce_obj(56); }
+
+/* UIController::StartReloadSkinThread() */
+extern "C"  void* __f_57(...) asm("_ZN12UIController21StartReloadSkinThreadEv");
+ void* __f_57(...) { return __mce_obj(57); }
+
+/* UIController::UpdateSelectedItemPos(unsigned int) */
+extern "C"  void* __f_58(...) asm("_ZN12UIController21UpdateSelectedItemPosEj");
+ void* __f_58(...) { return __mce_obj(58); }
+
+/* UIController::HandleInventoryUpdated(int) */
+extern "C"  void* __f_59(...) asm("_ZN12UIController22HandleInventoryUpdatedEi");
+ void* __f_59(...) { return __mce_obj(59); }
+
+/* UIController::SetTrialTimerLimitSecs(unsigned int) */
+extern "C"  void* __f_60(...) asm("_ZN12UIController22SetTrialTimerLimitSecsEj");
+ void* __f_60(...) { return __mce_obj(60); }
+
+/* UIController::SetTutorialDescription(int, _TutorialPopupInfo*) */
+extern "C"  void* __f_61(...) asm("_ZN12UIController22SetTutorialDescriptionEiP18_TutorialPopupInfo");
+ void* __f_61(...) { return __mce_obj(61); }
+
+/* UIController::IsContainerMenuDisplayed(int) */
+extern "C"  void* __f_62(...) asm("_ZN12UIController24IsContainerMenuDisplayedEi");
+ void* __f_62(...) { return __mce_obj(62); }
+
+/* UIController::HandleDLCMountingComplete() */
+extern "C"  void* __f_63(...) asm("_ZN12UIController25HandleDLCMountingCompleteEv");
+ void* __f_63(...) { return __mce_obj(63); }
+
+/* UIController::HandleTMSBanFileRetrieved(int) */
+extern "C"  void* __f_64(...) asm("_ZN12UIController25HandleTMSBanFileRetrievedEi");
+ void* __f_64(...) { return __mce_obj(64); }
+
+/* UIController::HandleTMSDLCFileRetrieved(int) */
+extern "C"  void* __f_65(...) asm("_ZN12UIController25HandleTMSDLCFileRetrievedEi");
+ void* __f_65(...) { return __mce_obj(65); }
+
+/* UIController::ShowOtherPlayersBaseScene(unsigned int, bool) */
+extern "C"  void* __f_66(...) asm("_ZN12UIController25ShowOtherPlayersBaseSceneEjb");
+ void* __f_66(...) { return __mce_obj(66); }
+
+/* UIController::ShowUIDebugMarketingGuide(bool) */
+extern "C"  void* __f_67(...) asm("_ZN12UIController25ShowUIDebugMarketingGuideEb");
+ void* __f_67(...) { return __mce_obj(67); }
+
+/* UIController::UpdatePlayerBasePositions() */
+extern "C"  void* __f_68(...) asm("_ZN12UIController25UpdatePlayerBasePositionsEv");
+ void* __f_68(...) { return __mce_obj(68); }
+
+/* UIController::IsExpectingOrReloadingSkin() */
+extern "C"  void* __f_69(...) asm("_ZN12UIController26IsExpectingOrReloadingSkinEv");
+ void* __f_69(...) { return __mce_obj(69); }
+
+/* UIController::RemoveInteractSceneReference(int, UIScene*) */
+extern "C"  void* __f_70(...) asm("_ZN12UIController28RemoveInteractSceneReferenceEiP7UIScene");
+ void* __f_70(...) { return __mce_obj(70); }
+
+/* UIController::UpdateAutosaveCountdownTimer(unsigned int) */
+extern "C"  void* __f_71(...) asm("_ZN12UIController28UpdateAutosaveCountdownTimerEj");
+ void* __f_71(...) { return __mce_obj(71); }
+
+/* UIController::IsIgnoreAutosaveMenuDisplayed(int) */
+extern "C"  void* __f_72(...) asm("_ZN12UIController29IsIgnoreAutosaveMenuDisplayedEi");
+ void* __f_72(...) { return __mce_obj(72); }
+
+/* UIController::SetIgnoreAutosaveMenuDisplayed(int, bool) */
+extern "C"  void* __f_73(...) asm("_ZN12UIController30SetIgnoreAutosaveMenuDisplayedEib");
+ void* __f_73(...) { return __mce_obj(73); }
+
+/* UIController::IsIgnorePlayerJoinMenuDisplayed(int) */
+extern "C"  void* __f_74(...) asm("_ZN12UIController31IsIgnorePlayerJoinMenuDisplayedEi");
+ void* __f_74(...) { return __mce_obj(74); }
+
+/* UIController::tick() */
+extern "C"  void* __f_75(...) asm("_ZN12UIController4tickEv");
+ void* __f_75(...) { return __mce_obj(75); }
+
+/* UIController::FindScene(EUIScene) */
+extern "C"  void* __f_76(...) asm("_ZN12UIController9FindSceneE8EUIScene");
+ void* __f_76(...) { return __mce_obj(76); }
+
+/* UIController::PlayUISFX(ESoundEffect) */
+extern "C"  void* __f_77(...) asm("_ZN12UIController9PlayUISFXE12ESoundEffect");
+ void* __f_77(...) { return __mce_obj(77); }
+
+/* UIController::UIController() */
+extern "C"  void* __f_78(...) asm("_ZN12UIControllerC2Ev");
+ void* __f_78(...) { return __mce_obj(78); }
+
+/* CMinecraftApp::GetTPConfigVal(wchar_t*) */
+extern "C"  void* __f_79(...) asm("_ZN13CMinecraftApp14GetTPConfigValEPw");
+ void* __f_79(...) { return __mce_obj(79); }
+
+/* ShutdownManager::HasStarted(ShutdownManager::EThreadId) */
+extern "C"  void* __f_80(...) asm("_ZN15ShutdownManager10HasStartedENS_9EThreadIdE");
+ void* __f_80(...) { return __mce_obj(80); }
+
+/* ShutdownManager::HasStarted(ShutdownManager::EThreadId, C4JThread::EventArray*) */
+extern "C"  void* __f_81(...) asm("_ZN15ShutdownManager10HasStartedENS_9EThreadIdEPN9C4JThread10EventArrayE");
+ void* __f_81(...) { return __mce_obj(81); }
+
+/* ShutdownManager::HasFinished(ShutdownManager::EThreadId) */
+extern "C"  void* __f_82(...) asm("_ZN15ShutdownManager11HasFinishedENS_9EThreadIdE");
+ void* __f_82(...) { return __mce_obj(82); }
+
+/* ShutdownManager::ShouldRun(ShutdownManager::EThreadId) */
+extern "C"  void* __f_83(...) asm("_ZN15ShutdownManager9ShouldRunENS_9EThreadIdE");
+ void* __f_83(...) { return __mce_obj(83); }
+
+/* LeaderboardManager::m_instance */
+extern "C"  char __d_84[256] asm("_ZN18LeaderboardManager10m_instanceE");
+ char __d_84[256] = {0};
+
+/* CGameNetworkManager::GatherStats() */
+extern "C"  void* __f_85(...) asm("_ZN19CGameNetworkManager11GatherStatsEv");
+ void* __f_85(...) { return __mce_obj(85); }
+
+/* CGameNetworkManager::IsInSession() */
+extern "C"  void* __f_86(...) asm("_ZN19CGameNetworkManager11IsInSessionEv");
+ void* __f_86(...) { return __mce_obj(86); }
+
+/* CGameNetworkManager::ServerReady() */
+extern "C"  void* __f_87(...) asm("_ZN19CGameNetworkManager11ServerReadyEv");
+ void* __f_87(...) { return __mce_obj(87); }
+
+/* CGameNetworkManager::IsInGameplay() */
+extern "C"  void* __f_88(...) asm("_ZN19CGameNetworkManager12IsInGameplayEv");
+ void* __f_88(...) { return __mce_obj(88); }
+
+/* CGameNetworkManager::SetLocalGame(bool) */
+extern "C"  void* __f_89(...) asm("_ZN19CGameNetworkManager12SetLocalGameEb");
+ void* __f_89(...) { return __mce_obj(89); }
+
+/* CGameNetworkManager::GetHostPlayer() */
+extern "C"  void* __f_90(...) asm("_ZN19CGameNetworkManager13GetHostPlayerEv");
+ void* __f_90(...) { return __mce_obj(90); }
+
+/* CGameNetworkManager::ServerStopped() */
+extern "C"  void* __f_91(...) asm("_ZN19CGameNetworkManager13ServerStoppedEv");
+ void* __f_91(...) { return __mce_obj(91); }
+
+/* CGameNetworkManager::SystemFlagGet(INetworkPlayer*, int) */
+extern "C"  void* __f_92(...) asm("_ZN19CGameNetworkManager13SystemFlagGetEP14INetworkPlayeri");
+ void* __f_92(...) { return __mce_obj(92); }
+
+/* CGameNetworkManager::SystemFlagSet(INetworkPlayer*, int) */
+extern "C"  void* __f_93(...) asm("_ZN19CGameNetworkManager13SystemFlagSetEP14INetworkPlayeri");
+ void* __f_93(...) { return __mce_obj(93); }
+
+/* CGameNetworkManager::GatherRTTStats() */
+extern "C"  void* __f_94(...) asm("_ZN19CGameNetworkManager14GatherRTTStatsEv");
+ void* __f_94(...) { return __mce_obj(94); }
+
+/* CGameNetworkManager::CorrectErrorIDS(int) */
+extern "C"  void* __f_95(...) asm("_ZN19CGameNetworkManager15CorrectErrorIDSEi");
+ void* __f_95(...) { return __mce_obj(95); }
+
+/* CGameNetworkManager::SessionHasSpace(unsigned int) */
+extern "C"  void* __f_96(...) asm("_ZN19CGameNetworkManager15SessionHasSpaceEj");
+ void* __f_96(...) { return __mce_obj(96); }
+
+/* CGameNetworkManager::GetPlayerByIndex(int) */
+extern "C"  void* __f_97(...) asm("_ZN19CGameNetworkManager16GetPlayerByIndexEi");
+ void* __f_97(...) { return __mce_obj(97); }
+
+/* CGameNetworkManager::renderQueueMeter() */
+extern "C"  void* __f_98(...) asm("_ZN19CGameNetworkManager16renderQueueMeterEv");
+ void* __f_98(...) { return __mce_obj(98); }
+
+/* CGameNetworkManager::GetPlayerBySmallId(unsigned char) */
+extern "C"  void* __f_99(...) asm("_ZN19CGameNetworkManager18GetPlayerBySmallIdEh");
+ void* __f_99(...) { return __mce_obj(99); }
+
+/* CGameNetworkManager::HandleSignInChange() */
+extern "C"  void* __f_100(...) asm("_ZN19CGameNetworkManager18HandleSignInChangeEv");
+ void* __f_100(...) { return __mce_obj(100); }
+
+/* CGameNetworkManager::GetOnlinePlayerCount() */
+extern "C"  void* __f_101(...) asm("_ZN19CGameNetworkManager20GetOnlinePlayerCountEv");
+ void* __f_101(...) { return __mce_obj(101); }
+
+/* CGameNetworkManager::IsNetworkThreadRunning() */
+extern "C"  void* __f_102(...) asm("_ZN19CGameNetworkManager22IsNetworkThreadRunningEv");
+ void* __f_102(...) { return __mce_obj(102); }
+
+/* CGameNetworkManager::JoinGameFromInviteInfo(int, int, INVITE_INFO const*) */
+extern "C"  void* __f_103(...) asm("_ZN19CGameNetworkManager22JoinGameFromInviteInfoEiiPK11INVITE_INFO");
+ void* __f_103(...) { return __mce_obj(103); }
+
+/* CGameNetworkManager::AddLocalPlayerByUserIndex(int) */
+extern "C"  void* __f_104(...) asm("_ZN19CGameNetworkManager25AddLocalPlayerByUserIndexEi");
+ void* __f_104(...) { return __mce_obj(104); }
+
+/* CGameNetworkManager::GetLocalPlayerByUserIndex(int) */
+extern "C"  void* __f_105(...) asm("_ZN19CGameNetworkManager25GetLocalPlayerByUserIndexEi");
+ void* __f_105(...) { return __mce_obj(105); }
+
+/* CGameNetworkManager::ChangeSessionTypeThreadProc(void*) */
+extern "C"  void* __f_106(...) asm("_ZN19CGameNetworkManager27ChangeSessionTypeThreadProcEPv");
+ void* __f_106(...) { return __mce_obj(106); }
+
+/* CGameNetworkManager::UpdateAndSetGameSessionData(INetworkPlayer*) */
+extern "C"  void* __f_107(...) asm("_ZN19CGameNetworkManager27UpdateAndSetGameSessionDataEP14INetworkPlayer");
+ void* __f_107(...) { return __mce_obj(107); }
+
+/* CGameNetworkManager::RemoveLocalPlayerByUserIndex(int) */
+extern "C"  void* __f_108(...) asm("_ZN19CGameNetworkManager28RemoveLocalPlayerByUserIndexEi");
+ void* __f_108(...) { return __mce_obj(108); }
+
+/* CGameNetworkManager::ExitAndJoinFromInviteThreadProc(void*) */
+extern "C"  void* __f_109(...) asm("_ZN19CGameNetworkManager31ExitAndJoinFromInviteThreadProcEPv");
+ void* __f_109(...) { return __mce_obj(109); }
+
+/* CGameNetworkManager::LeaveGame(bool) */
+extern "C"  void* __f_110(...) asm("_ZN19CGameNetworkManager9LeaveGameEb");
+ void* __f_110(...) { return __mce_obj(110); }
+
+/* CGameNetworkManager::CGameNetworkManager() */
+extern "C"  void* __f_111(...) asm("_ZN19CGameNetworkManagerC1Ev");
+ void* __f_111(...) { return __mce_obj(111); }
+
+/* ConsoleSaveFileSplit::ConsoleSaveFileSplit(ConsoleSaveFile*, bool, ProgressListener*) */
+extern "C"  void* __f_112(...) asm("_ZN20ConsoleSaveFileSplitC1EP15ConsoleSaveFilebP16ProgressListener");
+ void* __f_112(...) { return __mce_obj(112); }
+
+/* ConsoleSaveFileSplit::ConsoleSaveFileSplit(std::__ndk1::basic_string<wchar_t, std::__ndk1::char_traits<wchar_t>, std::__ndk1::allocator<wchar_t>> const&, void*, unsigned int, bool, ESavePlatform) */
+extern "C"  void* __f_113(...) asm("_ZN20ConsoleSaveFileSplitC1ERKNSt6__ndk112basic_stringIwNS0_11char_traitsIwEENS0_9allocatorIwEEEEPvjb13ESavePlatform");
+ void* __f_113(...) { return __mce_obj(113); }
+
+/* RemoveEntitiesPacket::MAX_PER_PACKET */
+extern "C"  char __d_114[256] asm("_ZN20RemoveEntitiesPacket14MAX_PER_PACKETE");
+ char __d_114[256] = {0};
+
+/* MultiPlayerChunkCache::MultiPlayerChunkCache(Level*) */
+extern "C"  void* __f_115(...) asm("_ZN21MultiPlayerChunkCacheC1EP5Level");
+ void* __f_115(...) { return __mce_obj(115); }
+
+/* MultiplayerLocalPlayer::awardStatFromServer(Stat*, arrayWithLength<unsigned char>) */
+extern "C"  void* __f_116(...) asm("_ZN22MultiplayerLocalPlayer19awardStatFromServerEP4Stat15arrayWithLengthIhE");
+ void* __f_116(...) { return __mce_obj(116); }
+
+/* MultiplayerLocalPlayer::MultiplayerLocalPlayer(Minecraft*, Level*, User*, ClientConnection*) */
+extern "C"  void* __f_117(...) asm("_ZN22MultiplayerLocalPlayerC1EP9MinecraftP5LevelP4UserP16ClientConnection");
+ void* __f_117(...) { return __mce_obj(117); }
+
+/* ConsoleSaveFileOriginal::doesFileExist(ConsoleSavePath) */
+extern "C"  void* __f_118(...) asm("_ZN23ConsoleSaveFileOriginal13doesFileExistE15ConsoleSavePath");
+ void* __f_118(...) { return __mce_obj(118); }
+
+/* ConsoleSaveFileOriginal::ConsoleSaveFileOriginal(std::__ndk1::basic_string<wchar_t, std::__ndk1::char_traits<wchar_t>, std::__ndk1::allocator<wchar_t>> const&, void*, unsigned int, bool, ESavePlatform) */
+extern "C"  void* __f_119(...) asm("_ZN23ConsoleSaveFileOriginalC1ERKNSt6__ndk112basic_stringIwNS0_11char_traitsIwEENS0_9allocatorIwEEEEPvjb13ESavePlatform");
+ void* __f_119(...) { return __mce_obj(119); }
+
+/* ConsoleSaveFileOriginal::~ConsoleSaveFileOriginal() */
+extern "C"  void* __f_120(...) asm("_ZN23ConsoleSaveFileOriginalD1Ev");
+ void* __f_120(...) { return __mce_obj(120); }
+
+/* ConsoleSaveFileInputStream::close() */
+extern "C"  void* __f_121(...) asm("_ZN26ConsoleSaveFileInputStream5closeEv");
+ void* __f_121(...) { return __mce_obj(121); }
+
+/* ConsoleSaveFileInputStream::ConsoleSaveFileInputStream(ConsoleSaveFile*, FileEntry*) */
+extern "C"  void* __f_122(...) asm("_ZN26ConsoleSaveFileInputStreamC1EP15ConsoleSaveFileP9FileEntry");
+ void* __f_122(...) { return __mce_obj(122); }
+
+/* ConsoleSaveFileInputStream::ConsoleSaveFileInputStream(ConsoleSaveFile*, ConsoleSavePath const&) */
+extern "C"  void* __f_123(...) asm("_ZN26ConsoleSaveFileInputStreamC1EP15ConsoleSaveFileRK15ConsoleSavePath");
+ void* __f_123(...) { return __mce_obj(123); }
+
+/* UIScene_FullscreenProgress::SetWasCancelled(bool) */
+extern "C"  void* __f_124(...) asm("_ZN26UIScene_FullscreenProgress15SetWasCancelledEb");
+ void* __f_124(...) { return __mce_obj(124); }
+
+/* ConsoleSaveFileOutputStream::close() */
+extern "C"  void* __f_125(...) asm("_ZN27ConsoleSaveFileOutputStream5closeEv");
+ void* __f_125(...) { return __mce_obj(125); }
+
+/* ConsoleSaveFileOutputStream::write(arrayWithLength<unsigned char>, unsigned int, unsigned int) */
+extern "C"  void* __f_126(...) asm("_ZN27ConsoleSaveFileOutputStream5writeE15arrayWithLengthIhEjj");
+ void* __f_126(...) { return __mce_obj(126); }
+
+/* ConsoleSaveFileOutputStream::ConsoleSaveFileOutputStream(ConsoleSaveFile*, FileEntry*) */
+extern "C"  void* __f_127(...) asm("_ZN27ConsoleSaveFileOutputStreamC1EP15ConsoleSaveFileP9FileEntry");
+ void* __f_127(...) { return __mce_obj(127); }
+
+/* ConsoleSaveFileOutputStream::ConsoleSaveFileOutputStream(ConsoleSaveFile*, ConsoleSavePath const&) */
+extern "C"  void* __f_128(...) asm("_ZN27ConsoleSaveFileOutputStreamC1EP15ConsoleSaveFileRK15ConsoleSavePath");
+ void* __f_128(...) { return __mce_obj(128); }
+
+/* Item::compass_Id */
+extern "C"  char __d_129[256] asm("_ZN4Item10compass_IdE");
+ char __d_129[256] = {0};
+
+/* Item::diamond_Id */
+extern "C"  char __d_130[256] asm("_ZN4Item10diamond_IdE");
+ char __d_130[256] = {0};
+
+/* Item::beef_raw_Id */
+extern "C"  char __d_131[256] asm("_ZN4Item11beef_raw_IdE");
+ char __d_131[256] = {0};
+
+/* Item::hoe_iron_Id */
+extern "C"  char __d_132[256] asm("_ZN4Item11hoe_iron_IdE");
+ char __d_132[256] = {0};
+
+/* Item::redStone_Id */
+extern "C"  char __d_133[256] asm("_ZN4Item11redStone_IdE");
+ char __d_133[256] = {0};
+
+/* Item::expBottle_Id */
+extern "C"  char __d_134[256] asm("_ZN4Item12expBottle_IdE");
+ char __d_134[256] = {0};
+
+/* Item::goldIngot_Id */
+extern "C"  char __d_135[256] asm("_ZN4Item12goldIngot_IdE");
+ char __d_135[256] = {0};
+
+/* Item::ironIngot_Id */
+extern "C"  char __d_136[256] asm("_ZN4Item12ironIngot_IdE");
+ char __d_136[256] = {0};
+
+/* Item::boots_iron_Id */
+extern "C"  char __d_137[256] asm("_ZN4Item13boots_iron_IdE");
+ char __d_137[256] = {0};
+
+/* Item::enderPearl_Id */
+extern "C"  char __d_138[256] asm("_ZN4Item13enderPearl_IdE");
+ char __d_138[256] = {0};
+
+/* Item::eyeOfEnder_Id */
+extern "C"  char __d_139[256] asm("_ZN4Item13eyeOfEnder_IdE");
+ char __d_139[256] = {0};
+
+/* Item::sword_iron_Id */
+extern "C"  char __d_140[256] asm("_ZN4Item13sword_iron_IdE");
+ char __d_140[256] = {0};
+
+/* Item::beef_cooked_Id */
+extern "C"  char __d_141[256] asm("_ZN4Item14beef_cooked_IdE");
+ char __d_141[256] = {0};
+
+/* Item::boots_chain_Id */
+extern "C"  char __d_142[256] asm("_ZN4Item14boots_chain_IdE");
+ char __d_142[256] = {0};
+
+/* Item::boots_cloth_Id */
+extern "C"  char __d_143[256] asm("_ZN4Item14boots_cloth_IdE");
+ char __d_143[256] = {0};
+
+/* Item::chicken_raw_Id */
+extern "C"  char __d_144[256] asm("_ZN4Item14chicken_raw_IdE");
+ char __d_144[256] = {0};
+
+/* Item::fish_cooked_Id */
+extern "C"  char __d_145[256] asm("_ZN4Item14fish_cooked_IdE");
+ char __d_145[256] = {0};
+
+/* Item::helmet_iron_Id */
+extern "C"  char __d_146[256] asm("_ZN4Item14helmet_iron_IdE");
+ char __d_146[256] = {0};
+
+/* Item::hoe_diamond_Id */
+extern "C"  char __d_147[256] asm("_ZN4Item14hoe_diamond_IdE");
+ char __d_147[256] = {0};
+
+/* Item::seeds_melon_Id */
+extern "C"  char __d_148[256] asm("_ZN4Item14seeds_melon_IdE");
+ char __d_148[256] = {0};
+
+/* Item::seeds_wheat_Id */
+extern "C"  char __d_149[256] asm("_ZN4Item14seeds_wheat_IdE");
+ char __d_149[256] = {0};
+
+/* Item::shovel_iron_Id */
+extern "C"  char __d_150[256] asm("_ZN4Item14shovel_iron_IdE");
+ char __d_150[256] = {0};
+
+/* Item::hatchet_iron_Id */
+extern "C"  char __d_151[256] asm("_ZN4Item15hatchet_iron_IdE");
+ char __d_151[256] = {0};
+
+/* Item::helmet_chain_Id */
+extern "C"  char __d_152[256] asm("_ZN4Item15helmet_chain_IdE");
+ char __d_152[256] = {0};
+
+/* Item::helmet_cloth_Id */
+extern "C"  char __d_153[256] asm("_ZN4Item15helmet_cloth_IdE");
+ char __d_153[256] = {0};
+
+/* Item::pickAxe_iron_Id */
+extern "C"  char __d_154[256] asm("_ZN4Item15pickAxe_iron_IdE");
+ char __d_154[256] = {0};
+
+/* Item::porkChop_raw_Id */
+extern "C"  char __d_155[256] asm("_ZN4Item15porkChop_raw_IdE");
+ char __d_155[256] = {0};
+
+/* Item::rotten_flesh_Id */
+extern "C"  char __d_156[256] asm("_ZN4Item15rotten_flesh_IdE");
+ char __d_156[256] = {0};
+
+/* Item::boots_diamond_Id */
+extern "C"  char __d_157[256] asm("_ZN4Item16boots_diamond_IdE");
+ char __d_157[256] = {0};
+
+/* Item::flintAndSteel_Id */
+extern "C"  char __d_158[256] asm("_ZN4Item16flintAndSteel_IdE");
+ char __d_158[256] = {0};
+
+/* Item::leggings_iron_Id */
+extern "C"  char __d_159[256] asm("_ZN4Item16leggings_iron_IdE");
+ char __d_159[256] = {0};
+
+/* Item::seeds_pumpkin_Id */
+extern "C"  char __d_160[256] asm("_ZN4Item16seeds_pumpkin_IdE");
+ char __d_160[256] = {0};
+
+/* Item::sword_diamond_Id */
+extern "C"  char __d_161[256] asm("_ZN4Item16sword_diamond_IdE");
+ char __d_161[256] = {0};
+
+/* Item::chicken_cooked_Id */
+extern "C"  char __d_162[256] asm("_ZN4Item17chicken_cooked_IdE");
+ char __d_162[256] = {0};
+
+/* Item::helmet_diamond_Id */
+extern "C"  char __d_163[256] asm("_ZN4Item17helmet_diamond_IdE");
+ char __d_163[256] = {0};
+
+/* Item::leggings_chain_Id */
+extern "C"  char __d_164[256] asm("_ZN4Item17leggings_chain_IdE");
+ char __d_164[256] = {0};
+
+/* Item::leggings_cloth_Id */
+extern "C"  char __d_165[256] asm("_ZN4Item17leggings_cloth_IdE");
+ char __d_165[256] = {0};
+
+/* Item::shovel_diamond_Id */
+extern "C"  char __d_166[256] asm("_ZN4Item17shovel_diamond_IdE");
+ char __d_166[256] = {0};
+
+/* Item::chestplate_iron_Id */
+extern "C"  char __d_167[256] asm("_ZN4Item18chestplate_iron_IdE");
+ char __d_167[256] = {0};
+
+/* Item::hatchet_diamond_Id */
+extern "C"  char __d_168[256] asm("_ZN4Item18hatchet_diamond_IdE");
+ char __d_168[256] = {0};
+
+/* Item::pickAxe_diamond_Id */
+extern "C"  char __d_169[256] asm("_ZN4Item18pickAxe_diamond_IdE");
+ char __d_169[256] = {0};
+
+/* Item::porkChop_cooked_Id */
+extern "C"  char __d_170[256] asm("_ZN4Item18porkChop_cooked_IdE");
+ char __d_170[256] = {0};
+
+/* Item::chestplate_chain_Id */
+extern "C"  char __d_171[256] asm("_ZN4Item19chestplate_chain_IdE");
+ char __d_171[256] = {0};
+
+/* Item::chestplate_cloth_Id */
+extern "C"  char __d_172[256] asm("_ZN4Item19chestplate_cloth_IdE");
+ char __d_172[256] = {0};
+
+/* Item::leggings_diamond_Id */
+extern "C"  char __d_173[256] asm("_ZN4Item19leggings_diamond_IdE");
+ char __d_173[256] = {0};
+
+/* Item::chestplate_diamond_Id */
+extern "C"  char __d_174[256] asm("_ZN4Item21chestplate_diamond_IdE");
+ char __d_174[256] = {0};
+
+/* Item::book_Id */
+extern "C"  char __d_175[256] asm("_ZN4Item7book_IdE");
+ char __d_175[256] = {0};
+
+/* Item::coal_Id */
+extern "C"  char __d_176[256] asm("_ZN4Item7coal_IdE");
+ char __d_176[256] = {0};
+
+/* Item::apple_Id */
+extern "C"  char __d_177[256] asm("_ZN4Item8apple_IdE");
+ char __d_177[256] = {0};
+
+/* Item::arrow_Id */
+extern "C"  char __d_178[256] asm("_ZN4Item8arrow_IdE");
+ char __d_178[256] = {0};
+
+/* Item::bread_Id */
+extern "C"  char __d_179[256] asm("_ZN4Item8bread_IdE");
+ char __d_179[256] = {0};
+
+/* Item::clock_Id */
+extern "C"  char __d_180[256] asm("_ZN4Item8clock_IdE");
+ char __d_180[256] = {0};
+
+/* Item::melon_Id */
+extern "C"  char __d_181[256] asm("_ZN4Item8melon_IdE");
+ char __d_181[256] = {0};
+
+/* Item::paper_Id */
+extern "C"  char __d_182[256] asm("_ZN4Item8paper_IdE");
+ char __d_182[256] = {0};
+
+/* Item::wheat_Id */
+extern "C"  char __d_183[256] asm("_ZN4Item8wheat_IdE");
+ char __d_183[256] = {0};
+
+/* Item::cookie_Id */
+extern "C"  char __d_184[256] asm("_ZN4Item9cookie_IdE");
+ char __d_184[256] = {0};
+
+/* Item::saddle_Id */
+extern "C"  char __d_185[256] asm("_ZN4Item9saddle_IdE");
+ char __d_185[256] = {0};
+
+/* Item::shears_Id */
+extern "C"  char __d_186[256] asm("_ZN4Item9shears_IdE");
+ char __d_186[256] = {0};
+
+/* Tile::lightGem_Id */
+extern "C"  char __d_187[256] asm("_ZN4Tile11lightGem_IdE");
+ char __d_187[256] = {0};
+
+/* Tile::bookshelf_Id */
+extern "C"  char __d_188[256] asm("_ZN4Tile12bookshelf_IdE");
+ char __d_188[256] = {0};
+
+/* Tile::cloth_Id */
+extern "C"  char __d_189[256] asm("_ZN4Tile8cloth_IdE");
+ char __d_189[256] = {0};
+
+/* Tile::glass_Id */
+extern "C"  char __d_190[256] asm("_ZN4Tile8glass_IdE");
+ char __d_190[256] = {0};
+
+/* C4JRender::MatrixMult(...) */
+extern "C"  void* __f_191(...) asm("_ZN9C4JRender10MatrixMultEz");
+ void* __f_191(...) { return __mce_obj(191); }
+
+/* C4JRender::CBuffDelete(...) */
+extern "C"  void* __f_192(...) asm("_ZN9C4JRender11CBuffDeleteEz");
+ void* __f_192(...) { return __mce_obj(192); }
+
+/* C4JRender::MatrixScale(...) */
+extern "C"  void* __f_193(...) asm("_ZN9C4JRender11MatrixScaleEz");
+ void* __f_193(...) { return __mce_obj(193); }
+
+/* C4JRender::TextureBind(...) */
+extern "C"  void* __f_194(...) asm("_ZN9C4JRender11TextureBindEz");
+ void* __f_194(...) { return __mce_obj(194); }
+
+/* C4JRender::TextureData(...) */
+extern "C"  void* __f_195(...) asm("_ZN9C4JRender11TextureDataEz");
+ void* __f_195(...) { return __mce_obj(195); }
+
+/* C4JRender::TextureFree(...) */
+extern "C"  void* __f_196(...) asm("_ZN9C4JRender11TextureFreeEz");
+ void* __f_196(...) { return __mce_obj(196); }
+
+/* C4JRender::UpdateGamma(...) */
+extern "C"  void* __f_197(...) asm("_ZN9C4JRender11UpdateGammaEz");
+ void* __f_197(...) { return __mce_obj(197); }
+
+/* C4JRender::DrawVertices(...) */
+extern "C"  void* __f_198(...) asm("_ZN9C4JRender12DrawVerticesEz");
+ void* __f_198(...) { return __mce_obj(198); }
+
+/* C4JRender::MatrixRotate(...) */
+extern "C"  void* __f_199(...) asm("_ZN9C4JRender12MatrixRotateEz");
+ void* __f_199(...) { return __mce_obj(199); }
+
+/* C4JRender::SetClearColour(...) */
+extern "C"  void* __f_200(...) asm("_ZN9C4JRender14SetClearColourEz");
+ void* __f_200(...) { return __mce_obj(200); }
+
+/* C4JRender::LoadTextureData — real (PNG via AImageDecoder) */
+#include <android/imagedecoder.h>
+#include <android/bitmap.h>
+extern "C" void* __f_201(uintptr_t, uintptr_t, uintptr_t, uintptr_t, uintptr_t)
+  asm("_ZN9C4JRender15LoadTextureDataEz");
+void* __f_201(uintptr_t a0, uintptr_t a1, uintptr_t a2, uintptr_t a3, uintptr_t a4) {
+    (void)a0;
+    const void* buf = nullptr; size_t buflen = 0;
+    D3DXIMAGE_INFO* info = nullptr; int** outp = nullptr;
+    unsigned char* owned = nullptr;
+    if (a2 > 0x100000000ULL) {
+        const char* path = (const char*)a1;
+        info = (D3DXIMAGE_INFO*)a2; outp = (int**)a3;
+        FILE* f = fopen(path, "rb");
+        if (!f) {
+            char p2[2048]; size_t n = strlen(path);
+            if (n >= sizeof(p2)) return (void*)0x80004005;
+            memcpy(p2, path, n+1);
+            for (size_t i=0;i<n;i++) if (p2[i]=='\\') p2[i]='/';
+            f = fopen(p2, "rb");
+        }
+        if (!f) { fprintf(stderr, "[LTD] fopen FAIL: %s\n", (const char*)a1); return (void*)0x80004005; }
+        fprintf(stderr, "[LTD] fopen OK: %s\n", (const char*)a1);
+        fseek(f, 0, SEEK_END); long sz = ftell(f); fseek(f, 0, SEEK_SET);
+        if (sz <= 0) { fclose(f); return (void*)0x80004005; }
+        owned = (unsigned char*)malloc((size_t)sz);
+        if (!owned) { fclose(f); return (void*)0x80004005; }
+        if (fread(owned, 1, (size_t)sz, f) != (size_t)sz) { free(owned); fclose(f); return (void*)0x80004005; }
+        fclose(f);
+        buf = owned; buflen = (size_t)sz;
+    } else {
+        buf = (const void*)a1; buflen = (size_t)a2;
+        info = (D3DXIMAGE_INFO*)a3; outp = (int**)a4;
+    }
+    fprintf(stderr, "[LTD] a2=0x%lx buflen=%zu\n", (unsigned long)a2, buflen);
+    AImageDecoder* dec = nullptr;
+    int cr = AImageDecoder_createFromBuffer(buf, buflen, &dec);
+    if (cr != ANDROID_IMAGE_DECODER_SUCCESS || !dec) {
+        fprintf(stderr, "[LTD] create fail rc=%d\n", cr);
+        if (owned) free(owned); return (void*)0x80004005;
+    }
+    AImageDecoder_setAndroidBitmapFormat(dec, ANDROID_BITMAP_FORMAT_RGBA_8888);
+    AImageDecoder_setUnpremultipliedRequired(dec, true);
+    const AImageDecoderHeaderInfo* h = AImageDecoder_getHeaderInfo(dec);
+    int32_t w = AImageDecoderHeaderInfo_getWidth(h);
+    int32_t hh = AImageDecoderHeaderInfo_getHeight(h);
+    size_t stride = AImageDecoder_getMinimumStride(dec);
+    size_t total = stride * (size_t)hh;
+    unsigned char* px = (unsigned char*)malloc(total);
+    if (!px) { AImageDecoder_delete(dec); if (owned) free(owned); return (void*)0x80004005; }
+    if (AImageDecoder_decodeImage(dec, px, stride, total) != ANDROID_IMAGE_DECODER_SUCCESS) {
+        free(px); AImageDecoder_delete(dec); if (owned) free(owned); return (void*)0x80004005;
+    }
+    AImageDecoder_delete(dec);
+    if (owned) free(owned);
+    int* outInts = new int[(size_t)w * (size_t)hh];
+    for (int y=0; y<hh; y++) for (int x=0; x<w; x++) {
+        unsigned char* p = px + (size_t)y*stride + (size_t)x*4;
+        unsigned r=p[0], g=p[1], b=p[2], al=p[3];
+        outInts[(size_t)y*w + x] = ((int)al<<24)|((int)r<<16)|((int)g<<8)|(int)b;
+    }
+    free(px);
+    if (info) { info->Width=(unsigned)w; info->Height=(unsigned)hh; }
+    if (outp) *outp = outInts;
+    return (void*)0;
+}
+
+/* C4JRender::MatrixTranslate(...) */
+extern "C"  void* __f_202(...) asm("_ZN9C4JRender15MatrixTranslateEz");
+ void* __f_202(...) { return __mce_obj(202); }
+
+/* C4JRender::TextureSetParam(...) */
+extern "C"  void* __f_203(...) asm("_ZN9C4JRender15TextureSetParamEz");
+ void* __f_203(...) { return __mce_obj(203); }
+
+/* C4JRender::MatrixOrthogonal(...) */
+extern "C"  void* __f_204(...) asm("_ZN9C4JRender16MatrixOrthogonalEz");
+ void* __f_204(...) { return __mce_obj(204); }
+
+/* C4JRender::MatrixPerspective(...) */
+extern "C"  void* __f_205(...) asm("_ZN9C4JRender17MatrixPerspectiveEz");
+ void* __f_205(...) { return __mce_obj(205); }
+
+/* C4JRender::StateSetAlphaFunc(...) */
+extern "C"  void* __f_206(...) asm("_ZN9C4JRender17StateSetAlphaFuncEz");
+ void* __f_206(...) { return __mce_obj(206); }
+
+/* C4JRender::StateSetDepthFunc(...) */
+extern "C"  void* __f_207(...) asm("_ZN9C4JRender17StateSetDepthFuncEz");
+ void* __f_207(...) { return __mce_obj(207); }
+
+/* C4JRender::StateSetFogColour(...) */
+extern "C"  void* __f_208(...) asm("_ZN9C4JRender17StateSetFogColourEz");
+ void* __f_208(...) { return __mce_obj(208); }
+
+/* C4JRender::StateSetTexGenCol(...) */
+extern "C"  void* __f_209(...) asm("_ZN9C4JRender17StateSetTexGenColEz");
+ void* __f_209(...) { return __mce_obj(209); }
+
+/* C4JRender::TextureBindVertex(...) */
+extern "C"  void* __f_210(...) asm("_ZN9C4JRender17TextureBindVertexEz");
+ void* __f_210(...) { return __mce_obj(210); }
+
+/* C4JRender::TextureDataUpdate(...) */
+extern "C"  void* __f_211(...) asm("_ZN9C4JRender17TextureDataUpdateEz");
+ void* __f_211(...) { return __mce_obj(211); }
+
+/* C4JRender::StateSetBlendFactor(...) */
+extern "C"  void* __f_212(...) asm("_ZN9C4JRender19StateSetBlendFactorEz");
+ void* __f_212(...) { return __mce_obj(212); }
+
+/* C4JRender::StateSetLightColour(...) */
+extern "C"  void* __f_213(...) asm("_ZN9C4JRender19StateSetLightColourEz");
+ void* __f_213(...) { return __mce_obj(213); }
+
+/* C4JRender::StateSetWriteEnable(...) */
+extern "C"  void* __f_214(...) asm("_ZN9C4JRender19StateSetWriteEnableEz");
+ void* __f_214(...) { return __mce_obj(214); }
+
+/* C4JRender::StateSetLightDirection(...) */
+extern "C"  void* __f_215(...) asm("_ZN9C4JRender22StateSetLightDirectionEz");
+ void* __f_215(...) { return __mce_obj(215); }
+
+/* C4JRender::TextureSetTextureLevels(...) */
+extern "C"  void* __f_216(...) asm("_ZN9C4JRender23TextureSetTextureLevelsEz");
+ void* __f_216(...) { return __mce_obj(216); }
+
+/* C4JRender::StateSetLightAmbientColour(...) */
+extern "C"  void* __f_217(...) asm("_ZN9C4JRender26StateSetLightAmbientColourEz");
+ void* __f_217(...) { return __mce_obj(217); }
+
+/* C4JRender::Clear(...) */
+extern "C"  void* __f_218(...) asm("_ZN9C4JRender5ClearEz");
+ void* __f_218(...) { return __mce_obj(218); }
+
+/* C4JRender::CBuffEnd(...) */
+extern "C"  void* __f_219(...) asm("_ZN9C4JRender8CBuffEndEz");
+ void* __f_219(...) { return __mce_obj(219); }
+
+/* C4JRender::CBuffCall(...) */
+extern "C"  void* __f_220(...) asm("_ZN9C4JRender9CBuffCallEz");
+ void* __f_220(...) { return __mce_obj(220); }
+
+/* C4JRender::MatrixGet(int) */
+extern "C"  void* __f_221(...) asm("_ZN9C4JRender9MatrixGetEi");
+ void* __f_221(...) { return __mce_obj(221); }
+
+/* C4JThread::EventArray::WaitForAll(int) */
+extern "C"  void* __f_222(...) asm("_ZN9C4JThread10EventArray10WaitForAllEi");
+ void* __f_222(...) { return __mce_obj(222); }
+
+/* C4JThread::EventArray::WaitForSingle(int, int) */
+extern "C"  void* __f_223(...) asm("_ZN9C4JThread10EventArray13WaitForSingleEii");
+ void* __f_223(...) { return __mce_obj(223); }
+
+/* C4JThread::EventArray::Set(int) */
+extern "C"  void* __f_224(...) asm("_ZN9C4JThread10EventArray3SetEi");
+ void* __f_224(...) { return __mce_obj(224); }
+
+/* C4JThread::EventArray::Clear(int) */
+extern "C"  void* __f_225(...) asm("_ZN9C4JThread10EventArray5ClearEi");
+ void* __f_225(...) { return __mce_obj(225); }
+
+/* C4JThread::EventArray::ClearAll() */
+extern "C"  void* __f_226(...) asm("_ZN9C4JThread10EventArray8ClearAllEv");
+ void* __f_226(...) { return __mce_obj(226); }
+
+/* C4JThread::EventArray::EventArray(int, C4JThread::EventArray::EMode) */
+extern "C"  void* __f_227(...) asm("_ZN9C4JThread10EventArrayC1EiNS0_5EModeE");
+ void* __f_227(...) { return __mce_obj(227); }
+
+/* C4JThread::SetPriority(int) */
+extern "C"  void* __f_228(...) asm("_ZN9C4JThread11SetPriorityEi");
+ void* __f_228(...) { return __mce_obj(228); }
+
+/* C4JThread::SetProcessor(int) */
+extern "C"  void* __f_229(...) asm("_ZN9C4JThread12SetProcessorEi");
+ void* __f_229(...) { return __mce_obj(229); }
+
+/* C4JThread::WaitForCompletion(int) */
+extern "C"  void* __f_230(...) asm("_ZN9C4JThread17WaitForCompletionEi");
+ void* __f_230(...) { return __mce_obj(230); }
+
+/* C4JThread::Run() */
+extern "C"  void* __f_231(...) asm("_ZN9C4JThread3RunEv");
+ void* __f_231(...) { return __mce_obj(231); }
+
+/* C4JThread::Event::WaitForSignal(int) */
+extern "C"  void* __f_232(...) asm("_ZN9C4JThread5Event13WaitForSignalEi");
+ void* __f_232(...) { return __mce_obj(232); }
+
+/* C4JThread::Event::Set() */
+extern "C"  void* __f_233(...) asm("_ZN9C4JThread5Event3SetEv");
+ void* __f_233(...) { return __mce_obj(233); }
+
+/* C4JThread::Event::Event(C4JThread::Event::EMode) */
+extern "C"  void* __f_234(...) asm("_ZN9C4JThread5EventC1ENS0_5EModeE");
+ void* __f_234(...) { return __mce_obj(234); }
+
+/* C4JThread::Event::~Event() */
+extern "C"  void* __f_235(...) asm("_ZN9C4JThread5EventD1Ev");
+ void* __f_235(...) { return __mce_obj(235); }
+
+/* C4JThread::C4JThread(int (*)(void*), void*, char const*, int) */
+extern "C"  void* __f_236(...) asm("_ZN9C4JThreadC1EPFiPvES0_PKci");
+ void* __f_236(...) { return __mce_obj(236); }
+
+/* C4JThread::~C4JThread() */
+extern "C"  void* __f_237(...) asm("_ZN9C4JThreadD1Ev");
+ void* __f_237(...) { return __mce_obj(237); }
+
+/* C_4JInput::ButtonDown(int, unsigned char) */
+extern "C"  void* __f_238(...) asm("_ZN9C_4JInput10ButtonDownEih");
+ void* __f_238(...) { return __mce_obj(238); }
+
+/* C_4JInput::ButtonPressed(int, unsigned char) */
+extern "C"  void* __f_239(...) asm("_ZN9C_4JInput13ButtonPressedEih");
+ void* __f_239(...) { return __mce_obj(239); }
+
+/* C_4JInput::GetIdleSeconds(int) */
+extern "C"  void* __f_240(...) asm("_ZN9C_4JInput14GetIdleSecondsEi");
+ void* __f_240(...) { return __mce_obj(240); }
+
+/* C_4JInput::IsPadConnected(int) */
+extern "C"  void* __f_241(...) asm("_ZN9C_4JInput14IsPadConnectedEi");
+ void* __f_241(...) { return __mce_obj(241); }
+
+/* C_4JInput::GetJoypadMapVal(int) */
+extern "C"  void* __f_242(...) asm("_ZN9C_4JInput15GetJoypadMapValEi");
+ void* __f_242(...) { return __mce_obj(242); }
+
+/* C_4JInput::SetDebugSequence(char const*, int (*)(void*), void*) */
+extern "C"  void* __f_243(...) asm("_ZN9C_4JInput16SetDebugSequenceEPKcPFiPvES2_");
+ void* __f_243(...) { return __mce_obj(243); }
+
+/* C_4JInput::GetGameJoypadMaps(unsigned char, unsigned char) */
+extern "C"  void* __f_244(...) asm("_ZN9C_4JInput17GetGameJoypadMapsEhh");
+ void* __f_244(...) { return __mce_obj(244); }
+
+/* C_4JInput::GetJoypadStick_LX(int, bool) */
+extern "C"  void* __f_245(...) asm("_ZN9C_4JInput17GetJoypadStick_LXEib");
+ void* __f_245(...) { return __mce_obj(245); }
+
+/* C_4JInput::GetJoypadStick_LY(int, bool) */
+extern "C"  void* __f_246(...) asm("_ZN9C_4JInput17GetJoypadStick_LYEib");
+ void* __f_246(...) { return __mce_obj(246); }
+
+/* C_4JInput::GetJoypadStick_RX(int, bool) */
+extern "C"  void* __f_247(...) asm("_ZN9C_4JInput17GetJoypadStick_RXEib");
+ void* __f_247(...) { return __mce_obj(247); }
+
+/* C_4JInput::GetJoypadStick_RY(int, bool) */
+extern "C"  void* __f_248(...) asm("_ZN9C_4JInput17GetJoypadStick_RYEib");
+ void* __f_248(...) { return __mce_obj(248); }
+
+/* C_4JInput::Tick() */
+extern "C"  void* __f_249(...) asm("_ZN9C_4JInput4TickEv");
+ void* __f_249(...) { return __mce_obj(249); }
+
+/* C_4JInput::GetValue(int, unsigned char, bool) */
+extern "C"  void* __f_250(...) asm("_ZN9C_4JInput8GetValueEihb");
+ void* __f_250(...) { return __mce_obj(250); }
+
+/* SFontData::Codepoints */
+extern "C"  char __d_251[256] asm("_ZN9SFontData10CodepointsE");
+ char __d_251[256] = {0};
+
+/* typeinfo for UIController */
+extern "C"  char __d_252[256] asm("_ZTI12UIController");
+ char __d_252[256] = {0};
+
+/* typeinfo for MultiplayerLocalPlayer */
+extern "C"  char __d_253[256] asm("_ZTI22MultiplayerLocalPlayer");
+ char __d_253[256] = {0};
+
+/* typeinfo for std::__ndk1::bad_weak_ptr */
+extern "C"  char __d_254[256] asm("_ZTINSt6__ndk112bad_weak_ptrE");
+ char __d_254[256] = {0};
+
+/* typeinfo for std::__ndk1::basic_istream<wchar_t, std::__ndk1::char_traits<wchar_t>> */
+extern "C"  char __d_255[256] asm("_ZTINSt6__ndk113basic_istreamIwNS_11char_traitsIwEEEE");
+ char __d_255[256] = {0};
+
+/* typeinfo for std::__ndk1::basic_ostream<wchar_t, std::__ndk1::char_traits<wchar_t>> */
+extern "C"  char __d_256[256] asm("_ZTINSt6__ndk113basic_ostreamIwNS_11char_traitsIwEEEE");
+ char __d_256[256] = {0};
+
+/* typeinfo for std::__ndk1::basic_streambuf<wchar_t, std::__ndk1::char_traits<wchar_t>> */
+extern "C"  char __d_257[256] asm("_ZTINSt6__ndk115basic_streambufIwNS_11char_traitsIwEEEE");
+ char __d_257[256] = {0};
+
+/* typeinfo for std::__ndk1::__shared_weak_count */
+extern "C"  char __d_258[256] asm("_ZTINSt6__ndk119__shared_weak_countE");
+ char __d_258[256] = {0};
+
+/* typeinfo for std::__ndk1::__codecvt_utf8_utf16<wchar_t> */
+extern "C"  char __d_259[256] asm("_ZTINSt6__ndk120__codecvt_utf8_utf16IwEE");
+ char __d_259[256] = {0};
+
+/* typeinfo for std::range_error */
+extern "C"  char __d_260[256] asm("_ZTISt11range_error");
+ char __d_260[256] = {0};
+
+/* typeinfo for std::length_error */
+extern "C"  char __d_261[256] asm("_ZTISt12length_error");
+ char __d_261[256] = {0};
+
+/* typeinfo for std::out_of_range */
+extern "C"  char __d_262[256] asm("_ZTISt12out_of_range");
+ char __d_262[256] = {0};
+
+/* typeinfo for std::bad_array_new_length */
+extern "C"  char __d_263[256] asm("_ZTISt20bad_array_new_length");
+ char __d_263[256] = {0};
+
+/* typeinfo for std::exception */
+extern "C"  char __d_264[256] asm("_ZTISt9exception");
+ char __d_264[256] = {0};
+
+/* VTT for std::__ndk1::basic_stringstream<char, std::__ndk1::char_traits<char>, std::__ndk1::allocator<char>> */
+extern "C"  char __d_265[256] asm("_ZTTNSt6__ndk118basic_stringstreamIcNS_11char_traitsIcEENS_9allocatorIcEEEE");
+ char __d_265[256] = {0};
+
+/* vtable for UIController */
+extern "C"  char __d_266[256] asm("_ZTV12UIController");
+ char __d_266[256] = {0};
+
+/* vtable for __cxxabiv1::__class_type_info */
+extern "C"  char __d_267[256] asm("_ZTVN10__cxxabiv117__class_type_infoE");
+ char __d_267[256] = {0};
+
+/* vtable for __cxxabiv1::__si_class_type_info */
+extern "C"  char __d_268[256] asm("_ZTVN10__cxxabiv120__si_class_type_infoE");
+ char __d_268[256] = {0};
+
+/* vtable for __cxxabiv1::__vmi_class_type_info */
+extern "C"  char __d_269[256] asm("_ZTVN10__cxxabiv121__vmi_class_type_infoE");
+ char __d_269[256] = {0};
+
+/* vtable for std::__ndk1::bad_weak_ptr */
+extern "C"  char __d_270[256] asm("_ZTVNSt6__ndk112bad_weak_ptrE");
+ char __d_270[256] = {0};
+
+/* vtable for std::__ndk1::__shared_count */
+extern "C"  char __d_271[256] asm("_ZTVNSt6__ndk114__shared_countE");
+ char __d_271[256] = {0};
+
+/* vtable for std::__ndk1::basic_stringbuf<char, std::__ndk1::char_traits<char>, std::__ndk1::allocator<char>> */
+extern "C"  char __d_272[256] asm("_ZTVNSt6__ndk115basic_stringbufIcNS_11char_traitsIcEENS_9allocatorIcEEEE");
+ char __d_272[256] = {0};
+
+/* vtable for std::__ndk1::basic_stringstream<char, std::__ndk1::char_traits<char>, std::__ndk1::allocator<char>> */
+extern "C"  char __d_273[256] asm("_ZTVNSt6__ndk118basic_stringstreamIcNS_11char_traitsIcEENS_9allocatorIcEEEE");
+ char __d_273[256] = {0};
+
+/* vtable for std::__ndk1::__shared_weak_count */
+extern "C"  char __d_274[256] asm("_ZTVNSt6__ndk119__shared_weak_countE");
+ char __d_274[256] = {0};
+
+/* vtable for std::__ndk1::__codecvt_utf8_utf16<wchar_t> */
+extern "C"  char __d_275[256] asm("_ZTVNSt6__ndk120__codecvt_utf8_utf16IwEE");
+ char __d_275[256] = {0};
+
+/* vtable for std::__ndk1::ios_base */
+extern "C"  char __d_276[256] asm("_ZTVNSt6__ndk18ios_baseE");
+ char __d_276[256] = {0};
+
+/* vtable for std::__ndk1::basic_ios<char, std::__ndk1::char_traits<char>> */
+extern "C"  char __d_277[256] asm("_ZTVNSt6__ndk19basic_iosIcNS_11char_traitsIcEEEE");
+ char __d_277[256] = {0};
+
+/* vtable for std::__ndk1::basic_ios<wchar_t, std::__ndk1::char_traits<wchar_t>> */
+extern "C"  char __d_278[256] asm("_ZTVNSt6__ndk19basic_iosIwNS_11char_traitsIwEEEE");
+ char __d_278[256] = {0};
+
+/* vtable for std::range_error */
+extern "C"  char __d_279[256] asm("_ZTVSt11range_error");
+ char __d_279[256] = {0};
+
+/* vtable for std::length_error */
+extern "C"  char __d_280[256] asm("_ZTVSt12length_error");
+ char __d_280[256] = {0};
+
+/* vtable for std::out_of_range */
+extern "C"  char __d_281[256] asm("_ZTVSt12out_of_range");
+ char __d_281[256] = {0};
+
+/* vtable for std::exception */
+extern "C"  char __d_282[256] asm("_ZTVSt9exception");
+ char __d_282[256] = {0};
+
+/* virtual thunk to std::__ndk1::basic_istream<wchar_t, std::__ndk1::char_traits<wchar_t>>::~basic_istream() */
+extern "C"  void* __f_283(...) asm("_ZTv0_n24_NSt6__ndk113basic_istreamIwNS_11char_traitsIwEEED0Ev");
+ void* __f_283(...) { return __mce_obj(283); }
+
+/* virtual thunk to std::__ndk1::basic_istream<wchar_t, std::__ndk1::char_traits<wchar_t>>::~basic_istream() */
+extern "C"  void* __f_284(...) asm("_ZTv0_n24_NSt6__ndk113basic_istreamIwNS_11char_traitsIwEEED1Ev");
+ void* __f_284(...) { return __mce_obj(284); }
+
+/* virtual thunk to std::__ndk1::basic_ostream<wchar_t, std::__ndk1::char_traits<wchar_t>>::~basic_ostream() */
+extern "C"  void* __f_285(...) asm("_ZTv0_n24_NSt6__ndk113basic_ostreamIwNS_11char_traitsIwEEED0Ev");
+ void* __f_285(...) { return __mce_obj(285); }
+
+/* virtual thunk to std::__ndk1::basic_ostream<wchar_t, std::__ndk1::char_traits<wchar_t>>::~basic_ostream() */
+extern "C"  void* __f_286(...) asm("_ZTv0_n24_NSt6__ndk113basic_ostreamIwNS_11char_traitsIwEEED1Ev");
+ void* __f_286(...) { return __mce_obj(286); }
+
+
+
+
+
+/* operator delete(void*, unsigned long, std::align_val_t) */
+extern "C"  void* __f_291(...) asm("_ZdlPvmSt11align_val_t");
+ void* __f_291(...) { return __mce_obj(291); }
+
+
+
+

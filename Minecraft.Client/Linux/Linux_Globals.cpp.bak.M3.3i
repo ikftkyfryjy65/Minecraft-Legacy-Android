@@ -1,0 +1,131 @@
+#include "stdafx.h"
+/* M3.1: EGL Command Channel Bridge */
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <string.h>
+#include <stdint.h>
+#include <stdio.h>
+
+#define MCE_MAGIC   0x4D434531u
+#define CMD_CLEAR   1
+#define CMD_PRESENT 2
+#define CMD_DRAW    3
+
+struct MCECmdExt {
+    volatile uint32_t magic;
+    volatile uint32_t seq;
+    volatile uint32_t cmd;
+    volatile float    params[8];
+    volatile uint32_t result;
+    volatile uint32_t pad[8];
+};
+
+static MCECmdExt* g_mce_cmd = nullptr;
+static int g_mce_cmd_fd = -1;
+
+static void __attribute__((constructor(150)))
+mce_cmd_bridge_init() {
+    const char* path = getenv("MCE_CMD_PATH");
+    if (!path) return;
+    g_mce_cmd_fd = open(path, O_RDWR);
+    if (g_mce_cmd_fd < 0) return;
+    void* p = mmap(nullptr, 4096, PROT_READ|PROT_WRITE, MAP_SHARED, g_mce_cmd_fd, 0);
+    if (p == MAP_FAILED) { g_mce_cmd = nullptr; return; }
+    g_mce_cmd = (MCECmdExt*)p;
+    if (g_mce_cmd->magic != MCE_MAGIC) { g_mce_cmd = nullptr; return; }
+    fprintf(stderr, "[bridge] CMD channel attached: %s\n", path);
+
+    /* === A2 TEST: send a RED color immediately === */
+    g_mce_cmd->params[0] = 0.95f;  /* r - RED */
+    g_mce_cmd->params[1] = 0.15f;  /* g */
+    g_mce_cmd->params[2] = 0.15f;  /* b */
+    g_mce_cmd->params[3] = 1.0f;   /* a */
+    g_mce_cmd->cmd = CMD_DRAW;
+    __sync_synchronize();
+    g_mce_cmd->seq++;
+    fprintf(stderr, "[bridge] Test RED sent (seq=1)\n");
+}
+
+static inline void mce_send(uint32_t cmd, float r, float g, float b, float a) {
+    if (!g_mce_cmd) return;
+    g_mce_cmd->params[0] = r;
+    g_mce_cmd->params[1] = g;
+    g_mce_cmd->params[2] = b;
+    g_mce_cmd->params[3] = a;
+    g_mce_cmd->cmd = cmd;
+    __sync_synchronize();
+    g_mce_cmd->seq = g_mce_cmd->seq + 1;
+}
+
+/* Linux/Android — auto-generated C4JRender impl. Real GLES in Phase 5+. */
+#include "stdafx.h"
+#include "Common/Consoles_App.h"
+#include "Linux/4JLibs/inc/4J_Render.h"
+
+void C4JRender::Tick() {}
+void C4JRender::MatrixMode(int) {}
+void C4JRender::MatrixSetIdentity() {}
+void C4JRender::MatrixPop() {}
+void C4JRender::MatrixPush() {}
+void C4JRender::Set_matrixDirty() {}
+void C4JRender::Initialise(IDirect3DDevice9 *) {}
+void C4JRender::InitialiseContext() {
+    mce_send(CMD_DRAW, 0, 0, 0, 0);  /* signal init */
+}
+void C4JRender::StartFrame() {
+    mce_send(CMD_DRAW, 0.05f, 0.05f, 0.10f, 1.0f);
+}
+void C4JRender::Present() {
+    mce_send(CMD_PRESENT, 0, 0, 0, 0);
+}
+void C4JRender::Clear(...) {
+    /* ignored — StartFrame sends the color */
+}
+void C4JRender::SetClearColour(...) {
+    /* ignored */
+}
+bool C4JRender::IsWidescreen() { return false; }
+bool C4JRender::IsHiDef() { return false; }
+void C4JRender::CaptureThumbnail(LPD3DXBUFFER *) {}
+void C4JRender::CaptureScreen(LPD3DXBUFFER *, void *) {}
+void C4JRender::BeginConditionalSurvey(int) {}
+void C4JRender::EndConditionalSurvey() {}
+void C4JRender::BeginConditionalRendering(int) {}
+void C4JRender::EndConditionalRendering() {}
+void C4JRender::CBuffLockStaticCreations() {}
+int C4JRender::CBuffCreate(int) { return 0; }
+void C4JRender::CBuffStart(int) {}
+void C4JRender::CBuffClear(int) {}
+int C4JRender::CBuffSize(int) { return 0; }
+void C4JRender::CBuffTick() {}
+void C4JRender::CBuffDeferredModeStart() {}
+void C4JRender::CBuffDeferredModeEnd() {}
+int C4JRender::TextureCreate() { return 0; }
+int C4JRender::TextureGetTextureLevels() { return 0; }
+void C4JRender::TextureGetStats() {}
+void C4JRender::StateSetColour(float, float, float, float) {}
+void C4JRender::StateSetDepthMask(bool) {}
+void C4JRender::StateSetBlendEnable(bool) {}
+void C4JRender::StateSetBlendFunc(int, int) {}
+void C4JRender::StateSetFaceCull(bool) {}
+void C4JRender::StateSetFaceCullCW(bool) {}
+void C4JRender::StateSetLineWidth(float) {}
+void C4JRender::StateSetDepthTestEnable(bool) {}
+void C4JRender::StateSetAlphaTestEnable(bool) {}
+void C4JRender::StateSetDepthSlopeAndBias(float, float) {}
+void C4JRender::StateSetFogEnable(bool) {}
+void C4JRender::StateSetFogMode(int) {}
+void C4JRender::StateSetFogNearDistance(float) {}
+void C4JRender::StateSetFogFarDistance(float) {}
+void C4JRender::StateSetFogDensity(float) {}
+void C4JRender::StateSetLightingEnable(bool) {}
+void C4JRender::StateSetVertexTextureUV(float, float) {}
+void C4JRender::StateSetLightEnable(int, bool) {}
+void C4JRender::StateSetViewport(eViewportType) {}
+void C4JRender::StateSetEnableViewportClipPlanes(bool) {}
+void C4JRender::StateSetForceLOD(int) {}
+
+/* Globals */
+C4JRender RenderManager;

@@ -1,0 +1,44 @@
+#ifndef MOCK_XRNM_H
+#define MOCK_XRNM_H
+
+/* Minimal stub for Xbox 360 XRNM (Xbox Live Rich Network Module).
+ * Provides the declarations used by Minecraft.World/Socket.cpp.
+ * Real networking is not implemented — Phase 8 work. */
+
+class INetworkPlayer {
+public:
+    INetworkPlayer() {}
+    virtual ~INetworkPlayer() {}
+
+    virtual unsigned char GetSmallId() const { return 0; }
+    virtual void SendData(INetworkPlayer* /*target*/,
+                          const void*    /*data*/,
+                          unsigned int   /*size*/,
+                          unsigned int   /*flags*/) {}
+    virtual bool IsHost()  const { return false; }
+    virtual bool IsLocal() const { return false; }
+
+    /* Xbox LIVE / player info stubs */
+    virtual unsigned long long GetXuid() const { return 0ULL; }
+    virtual const char* GetGamertag() const { return ""; }
+    virtual const wchar_t* GetGamertagW() const { return L""; }
+    virtual int GetUserIndex() const { return 0; }
+    virtual bool IsTalking() const { return false; }
+    virtual bool IsMutedByLocalUser(int /*iUser*/) const { return false; }
+    virtual bool HasVoice() const { return false; }
+    virtual bool HasCamera() const { return false; }
+    virtual int GetSessionIndex() const { return 0; }
+    virtual int GetSendQueueSize(INetworkPlayer* /*p*/, unsigned int /*flags*/) const { return 0; }
+    virtual int GetCurrentRtt() const { return 0; }
+    virtual bool IsSameSystem(INetworkPlayer* /*p*/) const { return false; }
+    virtual void SetCustomDataValue(unsigned long long /*v*/) {}
+    virtual unsigned long long GetCustomDataValue() const { return 0ULL; }
+    virtual bool IsGuest() const { return false; }
+};
+
+struct XRNM_SEND_BUFFER {
+    unsigned char* pbyData;
+    unsigned int   dwDataSize;
+};
+
+#endif /* MOCK_XRNM_H */

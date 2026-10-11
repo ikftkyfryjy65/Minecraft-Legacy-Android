@@ -1,0 +1,266 @@
+#ifndef PLATFORM_ANDROID_TYPES_H
+#define PLATFORM_ANDROID_TYPES_H
+
+/* Opaque Xbox LIVE / marketplace types */
+struct XMARKETPLACE_CONTENTOFFER_INFO;
+typedef XMARKETPLACE_CONTENTOFFER_INFO* PXMARKETPLACE_CONTENTOFFER_INFO;
+
+/* XCONTENT_DATA now provided by Linux/4JLibs/inc/4J_Storage.h */
+
+/* XUI handle (opaque) */
+typedef void* HXUIOBJ;
+
+/* Xbox invite info (opaque) */
+struct INVITE_INFO;
+typedef struct INVITE_INFO INVITE_INFO;
+
+/* Xbox friends / session info (opaque) */
+struct FriendSessionInfo;
+typedef struct FriendSessionInfo FriendSessionInfo;
+
+/* 4J thread start function (matches World/C4JThread.h) */
+typedef int (C4JThreadStartFunc)(void* lpThreadParameter);
+
+/* Xbox LIVE constants */
+#ifndef XUSER_INDEX_ANY
+#define XUSER_INDEX_ANY                     0x000000FF
+#endif
+
+#ifndef XUSER_MAX_COUNT
+#define XUSER_MAX_COUNT                     4
+#endif
+
+#ifndef XMARKETPLACE_OFFERING_TYPE_CONTENT
+#define XMARKETPLACE_OFFERING_TYPE_CONTENT  0x00000001
+#endif
+
+/* Xbox user sign-in info: full definition (used as array) */
+typedef struct XUSER_SIGNIN_INFO {
+    unsigned int dwGuestNumber;
+    unsigned long long xuid;
+    unsigned int       dwInfoFlags;
+    unsigned int       dwUserSigninState;
+    unsigned char      _opaque[192];
+#ifndef XUSER_GET_SIGNIN_INFO_OFFLINE_XUID_ONLY
+#define XUSER_GET_SIGNIN_INFO_OFFLINE_XUID_ONLY 0x00000004
+#endif
+} XUSER_SIGNIN_INFO;
+static inline unsigned int XUserGetSigninInfo(int, unsigned int, XUSER_SIGNIN_INFO*) { return 0; }
+
+#ifdef __cplusplus
+/* ============================================================
+ * C++ stubs: 4J / Xbox / Sentient types sufficient to compile
+ * ============================================================ */
+
+class C_4JProfile {
+public:
+    struct PROFILESETTINGS;
+    int  GetPrimaryPad() const { return 0; }
+    void SetPrimaryPad(int) {}
+    bool IsSignedIn(int) const { return true; }
+    bool IsSignedInLive(int) const { return true; }
+    bool IsFullVersion() const { return true; }
+    bool IsGuest(int) const { return false; }
+    bool AreXUIDSEqual(unsigned long long, unsigned long long) const { return false; }
+    void DisplayFullVersionPurchase(bool, int, int) {}
+    void ForceQueuedProfileWrites() {}
+    void ForceQueuedProfileWrites(int) {}
+    unsigned int GetChatAndContentRestrictions(int, bool, int*) { return 0; }
+    bool GetDashboardProfileSettings(int, PROFILESETTINGS*) { return false; }
+    bool GetGameDefinedProfileData(int) { return false; }
+    const wchar_t* GetGamertag(int) const { return L"Player"; }
+    bool GetLockedProfile(int) const { return false; }
+    bool GetLockedProfile() const { return false; }
+    bool ReAwardAchievements(int) { return false; }
+    void RemoveGamepadFromGame(int) {}
+    void ResetProfileProcessState() {}
+    void SetCurrentGameActivity(int, unsigned int, int) {}
+    void SetLockedProfile(int) {}
+    bool WriteToProfile(int, bool) { return true; }
+    bool WriteToProfile(int, bool, bool) { return true; }
+    unsigned long long getUserID(int) const { return 0; }
+    bool isConnectedToPSN(int) const { return true; }
+    bool isSignedInPSN(int) const { return true; }
+    /* Variadic — accepts any arg count; class (not enum) so safe. */
+    unsigned long long GetXUID(...) const { return 0; }
+    const wchar_t* GetDisplayName(...) const { return L"Player"; }
+    bool IsSystemUIDisplayed(...) const { return false; }
+    bool RequestSignInUI(...) { return false; }
+    bool RequestConvertOfflineToGuestUI(...) { return false; }
+
+
+    bool AllowedToPlayMultiplayer(int) const { return true; }
+    bool AllowedPlayerCreatedContent(int) const { return true; }
+    int  QuerySigninStatus(int) const { return 0; }
+    void Tick() {}
+    int  GetLiveConnectionStatus(int) const { return 0; }
+    int  GetLiveConnectionStatus() const { return 0; }
+};
+struct C_4JProfile::PROFILESETTINGS {
+    unsigned char _opaque[256];
+    int  iYAxisInversion;
+    bool bSwapSticks;
+};
+
+enum eUpsellType { eUpsellType_Undefined=0, eUpsellType_Custom=1 };
+enum eUpsellResponse { eUpsellResponse_Undefined=0, eUpsellResponse_Declined=1, eUpsellResponse_Accepted=2, eUpsellResponse_Accepted_NoPurchase=3, eUpsellResponse_Accepted_Purchase=4, eUpsellResponse_UserNotSignedInPSN=5, eUpsellResponse_NotAllowedOnline=6 };
+
+enum ESen_FriendOrMatch { eSen_FriendOrMatch_Unknown = 0, eSen_FriendOrMatch_Playing_With_Invited_Friends = 1, eSen_FriendOrMatch_Playing_With_Friends = 2 };
+enum ESen_CompeteOrCoop { eSen_CompeteOrCoop_Undefined = 0, eSen_CompeteOrCoop_Coop_and_Competitive = 1, eSen_CompeteOrCoop_Coop = 2, eSen_CompeteOrCoop_Competitive = 3 };
+enum ESen_LevelExitStatus { ESen_LevelExitStatus_Undefined = 0, eSen_LevelExitStatus_Exited = 1, eSen_LevelExitStatus_Saved = 2, eSen_LevelExitStatus_NotSaved = 3 };
+enum ESen_MediaDestination { ESen_MediaDestination_Undefined = 0 };
+enum ESen_MediaType        { ESen_MediaType_Undefined        = 0 };
+enum ESen_UpsellID { ESen_UpsellID_Undefined=0, eSen_UpsellID_Undefined=0, eSen_UpsellID_Full_Version_Of_Game=1 };
+enum ESen_UpsellOutcome { ESen_UpsellOutcome_Undefined=0, eSen_UpsellOutcome_Accepted=1, eSen_UpsellOutcome_Declined=2, eSen_UpsellOutcome_Went_To_Guide=3 };
+enum ETelemetryChallenges {
+    eTelemetryChallenges_Unknown = 0,
+    eTelemetryChallenges_None = 1,
+    ETelemetryChallenges_Undefined = 2,
+    eTelemetryTutorial_TrialStart = 100,
+    eTelemetryTutorial_Halfway = 101,
+    eTelemetryTutorial_Complete = 102,
+    eTelemetryTutorial_Crafting = 103,
+    eTelemetryTutorial_CreativeInventory = 104,
+    eTelemetryTutorial_CreativeMode = 105,
+    eTelemetryTutorial_Enchanting = 106,
+    eTelemetryTutorial_EnchantingMenu = 107,
+    eTelemetryTutorial_Enderchest = 108,
+    eTelemetryTutorial_Farming = 109,
+    eTelemetryTutorial_Fishing = 110,
+    eTelemetryTutorial_FoodBar = 111,
+    eTelemetryTutorial_Furnace = 112,
+    eTelemetryTutorial_Golem = 113,
+    eTelemetryTutorial_Inventory = 114,
+    eTelemetryTutorial_Minecart = 115,
+    eTelemetryTutorial_Portal = 116,
+    eTelemetryTutorial_Redstone_And_Pistons = 117,
+    eTelemetryTutorial_Trading = 118,
+    eTelemetryTutorial_TradingMenu = 119,
+    eTelemetryPlayerDeathSource_Skeleton = 200,
+    eTelemetryPlayerDeathSource_Ghast = 201,
+    eTelem_ModeId_Undefined = 300,
+    eTelem_LevelId_PlayerGeneratedLevel = 1000,
+    eTelem_LevelId_Undefined = 1001,
+    eTelem_ModeId_Creative = 1002,
+    eTelem_ModeId_Survival = 1003,
+    eTelem_SubLevelId_End = 1004,
+    eTelem_SubLevelId_Nether = 1005,
+    eTelem_SubLevelId_Overworld = 1006,
+    eTelem_SubLevelId_Undefined = 1007,
+    eTelem_SubModeId_Normal = 1008,
+    eTelem_SubModeId_Tutorial = 1009,
+    eTelem_SubModeId_Undefined = 1010,
+    eTelemetryPlayerDeathSource_Cactus = 1011,
+    eTelemetryPlayerDeathSource_Explosion_Creeper = 1012,
+    eTelemetryPlayerDeathSource_Explosion_Tnt = 1013,
+    eTelemetryPlayerDeathSource_Fall = 1014,
+    eTelemetryPlayerDeathSource_Fire = 1015,
+    eTelemetryPlayerDeathSource_Lava = 1016,
+    eTelemetryPlayerDeathSource_OutOfWorld = 1017,
+    eTelemetryPlayerDeathSource_Player_Arrow = 1018,
+    eTelemetryPlayerDeathSource_Player_Weapon = 1019,
+    eTelemetryPlayerDeathSource_Slime = 1020,
+    eTelemetryPlayerDeathSource_Spider = 1021,
+    eTelemetryPlayerDeathSource_Suffocate = 1022,
+    eTelemetryPlayerDeathSource_Water = 1023,
+    eTelemetryPlayerDeathSource_Wolf = 1024,
+    eTelemetryPlayerDeathSource_Zombie = 1025,
+    eTelemetryPlayerDeathSource_ZombiePigman = 1026,
+    eTelemetryTutorial_Anvil = 1027,
+    eTelemetryTutorial_AnvilMenu = 1028,
+    eTelemetryTutorial_Bed = 1029,
+    eTelemetryTutorial_Boat = 1030,
+    eTelemetryTutorial_Breeding = 1031,
+    eTelemetryTutorial_Brewing = 1032,
+    eTelemetryTutorial_BrewingMenu = 1033,
+};
+#endif /* __cplusplus */
+
+
+
+
+#endif /* PLATFORM_ANDROID_TYPES_H */
+
+/* Global profile manager */
+extern C_4JProfile ProfileManager;
+
+/* Xbox 360 presence contexts */
+enum {
+    CONTEXT_PRESENCE_UNDEFINED              = 0,
+    CONTEXT_PRESENCE_MULTIPLAYEROFFLINE     = 1,
+    CONTEXT_PRESENCE_MULTIPLAYER            = 2,
+    CONTEXT_PRESENCE_MULTIPLAYER_1POFFLINE  = 3,
+    CONTEXT_PRESENCE_MULTIPLAYER_1P         = 4,
+    CONTEXT_PRESENCE_BUILDING               = 5,
+    CONTEXT_PRESENCE_IDLE                   = 6,
+    CONTEXT_PRESENCE_MENUS                  = 7,
+};
+
+/* Xbox 360 rich presence game state contexts */
+enum {
+    CONTEXT_GAME_STATE_BLANK        = 0,
+    CONTEXT_GAME_STATE_MAIN_MENU    = 1,
+    CONTEXT_GAME_STATE_SINGLEPLAYER = 2,
+    CONTEXT_GAME_STATE_MULTIPLAYER  = 3,
+};
+
+/* Xbox 360 notification constants */
+enum {
+    XN_SYS_SIGNINCHANGED         = 0x00000001,
+    XN_SYS_INPUTDEVICESCHANGED   = 0x00000002,
+    XN_SYS_STORAGEDEVICESCHANGED = 0x00000003,
+    XN_LIVE_CONTENT_INSTALLED    = 0x00000004,
+    XN_LIVE_INVITE_ACCEPTED      = 0x00000005,
+};
+
+/* Xbox 360 locale constants (subset) */
+enum {
+    XC_LOCALE_UNITED_STATES=1, XC_LOCALE_GREAT_BRITAIN, XC_LOCALE_FRANCE, XC_LOCALE_GERMANY,
+    XC_LOCALE_ITALY, XC_LOCALE_SPAIN, XC_LOCALE_JAPAN, XC_LOCALE_KOREA,
+    XC_LOCALE_CHINA, XC_LOCALE_TAIWAN, XC_LOCALE_HONG_KONG, XC_LOCALE_SINGAPORE,
+    XC_LOCALE_AUSTRALIA, XC_LOCALE_NEW_ZEALAND, XC_LOCALE_CANADA, XC_LOCALE_MEXICO,
+    XC_LOCALE_BRAZIL, XC_LOCALE_ARGENTINA, XC_LOCALE_CHILE, XC_LOCALE_COLOMBIA,
+    XC_LOCALE_AUSTRIA, XC_LOCALE_BELGIUM, XC_LOCALE_CZECH_REPUBLIC, XC_LOCALE_DENMARK,
+    XC_LOCALE_FINLAND, XC_LOCALE_GREECE, XC_LOCALE_HUNGARY, XC_LOCALE_INDIA,
+    XC_LOCALE_IRELAND, XC_LOCALE_ISRAEL, XC_LOCALE_NETHERLANDS, XC_LOCALE_NORWAY,
+    XC_LOCALE_POLAND, XC_LOCALE_PORTUGAL, XC_LOCALE_RUSSIAN_FEDERATION, XC_LOCALE_SAUDI_ARABIA,
+    XC_LOCALE_SLOVAK_REPUBLIC, XC_LOCALE_SOUTH_AFRICA, XC_LOCALE_SWEDEN, XC_LOCALE_SWITZERLAND,
+    XC_LOCALE_TURKEY, XC_LOCALE_UNITED_ARAB_EMIRATES, XC_LOCALE_LATIN_AMERICA,
+    XC_LANGUAGE_SCHINESE, XC_LANGUAGE_TCHINESE,
+};
+
+static inline unsigned int XGetLanguage() { return 1; }  /* English */
+static inline unsigned int XGetLocale()   { return XC_LOCALE_UNITED_STATES; }
+
+static inline bool IsEqualXUID(unsigned long long a, unsigned long long b) { return a == b; }
+
+
+
+/* Auto-bulk telemetry enums (Patch 82) */
+/* removed duplicate eTelemetryTutorial block */
+
+/* Auto-bulk Sentient telemetry enums (Patch 83) */
+enum {
+    eSen_AudioSettings_Off = 0,
+    eSen_AudioSettings_On_CustomSetting = 1,
+    eSen_AudioSettings_On_Default = 2,
+    eSen_AudioSettings_Undefined = 3,
+    eSen_DefaultGameControls_Default_controls = 4,
+    eSen_DefaultGameControls_Undefined = 5,
+    eSen_DifficultyLevel_Easier = 6,
+    eSen_DifficultyLevel_Easiest = 7,
+    eSen_DifficultyLevel_Harder = 8,
+    eSen_DifficultyLevel_Normal = 9,
+    eSen_DifficultyLevel_Undefined = 10,
+    eSen_License_Full_Purchased_Title = 11,
+    eSen_License_Trial_or_Demo = 12,
+    eSen_License_Undefined = 13,
+    eSen_SingleOrMultiplayer_Multiplayer_Both_Local_and_Live = 14,
+    eSen_SingleOrMultiplayer_Multiplayer_Live = 15,
+    eSen_SingleOrMultiplayer_Multiplayer_Local = 16,
+    eSen_SingleOrMultiplayer_Single_Player = 17,
+    eSen_SingleOrMultiplayer_Undefined = 18,
+};
+
+/* PS3 console tty */
+enum { SYS_TTYP_USER1 = 0 };

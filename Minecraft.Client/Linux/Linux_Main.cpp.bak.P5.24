@@ -1,0 +1,38 @@
+#include <unistd.h>
+#include <signal.h>
+#include <ucontext.h>
+#include <cstdio>
+#include <dlfcn.h>
+
+extern "C" void segv_handler(int sig, siginfo_t* info, void* ctx) {
+    ucontext_t* uc = (ucontext_t*)ctx;
+    unsigned long pc = uc->uc_mcontext.pc;
+    Dl_info di;
+    char buf[256];
+    int n = 0;
+    if (dladdr((void*)pc, &di) && di.dli_fbase) {
+        n = snprintf(buf, sizeof(buf),
+            "[MCE] SEGV PC=0x%lx OFFSET=0x%lx ADDR=0x%lx\n",
+            pc, pc - (unsigned long)di.dli_fbase, (unsigned long)info->si_addr);
+    } else {
+        n = snprintf(buf, sizeof(buf), "[MCE] SEGV PC=0x%lx ADDR=0x%lx\n",
+                     pc, (unsigned long)info->si_addr);
+    }
+    write(2, buf, n);
+    _exit(139);
+}
+
+extern "C" void preinit_setup() {
+    struct sigaction sa = {};
+    sa.sa_sigaction = segv_handler;
+    sa.sa_flags = SA_SIGINFO | SA_ONSTACK;
+    sigaction(SIGSEGV, &sa, nullptr);
+}
+__attribute__((section(".preinit_array"), used))
+void (*preinit_ptr)() = preinit_setup;
+
+int main(int argc, char** argv) {
+    write(2, "[MCE] main reached\n", 19);
+    write(2, "[MCE] SUCCESS\n", 13);
+    return 0;
+}

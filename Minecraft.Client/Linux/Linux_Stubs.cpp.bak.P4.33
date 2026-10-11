@@ -1,0 +1,29 @@
+/* Linux/Android — remaining linker symbols. */
+#include "stdafx.h"
+#include "Common/UI/UIController.h"
+#include "Common/Network/GameNetworkManager.h"
+
+/* ---- Globals ---- */
+C_4JProfile ProfileManager;
+C4JStorage  StorageManager;
+C_4JInput   InputManager;
+CGameNetworkManager g_NetworkManager;
+
+/* ---- C4JStorage methods ---- */
+C4JStorage::PROFILESETTINGS* C4JStorage::GetDashboardProfileSettings(int) { return 0; }
+void  C4JStorage::WriteToProfile(int, bool, bool) {}
+void* C4JStorage::GetGameDefinedProfileData(int) { return 0; }
+
+/* ---- C_4JInput methods ---- */
+void C_4JInput::SetJoypadMapVal(int, unsigned char) {}
+void C_4JInput::SetJoypadStickAxisMap(int, unsigned int, unsigned int) {}
+void C_4JInput::SetJoypadStickTriggerMap(int, unsigned int, unsigned int) {}
+
+/* ---- UIController ---- */
+void UIController::DisplayGamertag(unsigned int, bool) {}
+void UIController::RefreshTooltips(unsigned int) {}
+void UIController::SetEnableTooltips(unsigned int, BOOL) {}
+void UIController::ShowSavingMessage(unsigned int, C4JStorage::ESavingMessage) {}
+
+/* ---- Win32 ---- */
+void InitializeCriticalSection(_CRITICAL_SECTION*) {}

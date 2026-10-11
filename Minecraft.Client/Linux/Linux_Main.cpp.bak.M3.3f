@@ -1,0 +1,50 @@
+/* M3.3: Android entry with crash diagnostics */
+#include "stdafx.h"
+#include "Minecraft.h"
+#include <string>
+#include <signal.h>
+#include <ucontext.h>
+#include <dlfcn.h>
+
+extern void __mce_construct_app();
+
+extern "C" void mce_segv_handler(int sig, siginfo_t* info, void* ctx) {
+    ucontext_t* uc = (ucontext_t*)ctx;
+    unsigned long pc = uc->uc_mcontext.pc;
+    Dl_info di;
+    char buf[512];
+    int n = 0;
+    if (dladdr((void*)pc, &di) && di.dli_fbase) {
+        n = snprintf(buf, sizeof(buf),
+            "\\n[MCE-SEGV] sig=%d PC_OFF=0x%lx ADDR=0x%lx\\n",
+            sig, pc - (unsigned long)di.dli_fbase,
+            (unsigned long)info->si_addr);
+    } else {
+        n = snprintf(buf, sizeof(buf),
+            "\\n[MCE-SEGV] sig=%d PC=0x%lx ADDR=0x%lx\\n",
+            sig, pc, (unsigned long)info->si_addr);
+    }
+    write(2, buf, n);
+    _exit(139);
+}
+
+extern "C" int __mce_run() {
+    write(2, "[mce] installing handlers\\n", 26);
+    struct sigaction sa = {};
+    sa.sa_sigaction = mce_segv_handler;
+    sa.sa_flags = SA_SIGINFO | SA_ONSTACK;
+    sigaction(SIGSEGV, &sa, nullptr);
+    sigaction(SIGBUS, &sa, nullptr);
+    sigaction(SIGABRT, &sa, nullptr);
+    sigaction(SIGILL, &sa, nullptr);
+    sigaction(SIGFPE, &sa, nullptr);
+
+    write(2, "[mce] __mce_run entered\\n", 24);
+    __mce_construct_app();
+    write(2, "[mce] app constructed, calling Minecraft::start\\n", 48);
+
+    Minecraft::start(std::wstring(L"Player"), std::wstring(L"-"));
+
+    write(2, "[mce] Minecraft::start returned\\n", 32);
+    return 0;
+}

@@ -1,0 +1,670 @@
+#ifndef COMPAT_H
+#define COMPAT_H
+
+#include <stdint.h>
+#include <stddef.h>
+#include <string.h>
+
+#include <pthread.h>
+#include <unistd.h>
+#include <time.h>
+#include <errno.h>
+
+/*
+ * Minimal Win32/Xbox compatibility layer
+ * Target: Linux / Android
+ */
+
+/* ============================================================
+ * Basic Windows types
+ * ============================================================ */
+
+typedef unsigned char       BYTE;
+typedef unsigned short      WORD;
+typedef unsigned int        DWORD;
+typedef unsigned int        UINT;
+typedef unsigned long       ULONG;
+typedef unsigned long long  ULONGLONG;
+typedef unsigned long long  ULONG_PTR;
+
+typedef long                LONG;
+typedef long long           LONGLONG;
+typedef long long           __int64;
+
+typedef int                 BOOL;
+
+typedef void                VOID;
+typedef void*               LPVOID;
+typedef const void*         LPCVOID;
+
+typedef char                CHAR;
+typedef wchar_t             WCHAR;
+
+typedef WCHAR*              LPWSTR;
+typedef const WCHAR*        LPCWSTR;
+
+typedef BYTE*               PBYTE;
+
+typedef size_t              SIZE_T;
+
+/*
+ * HRESULT
+ */
+typedef long HRESULT;
+
+/* ============================================================
+ * Common constants
+ * ============================================================ */
+
+#ifndef FALSE
+#define FALSE 0
+#endif
+
+#ifndef TRUE
+#define TRUE 1
+#endif
+
+#ifndef NULL
+#define NULL 0
+#endif
+
+#ifndef WINAPI
+#define WINAPI
+#endif
+
+#ifndef CALLBACK
+#define CALLBACK
+#endif
+
+#ifndef APIENTRY
+#define APIENTRY
+#endif
+
+/* ============================================================
+ * HANDLE
+ *
+ * We don't use a real Win32 HANDLE on Android.
+ * The actual compatibility implementation will live in
+ * compat.cpp.
+ * ============================================================ */
+
+typedef void* HANDLE;
+
+/* ============================================================
+ * FILETIME
+ * ============================================================ */
+
+typedef struct _FILETIME
+{
+    DWORD dwLowDateTime;
+    DWORD dwHighDateTime;
+} FILETIME;
+
+/* ============================================================
+ * LARGE_INTEGER
+ * ============================================================ */
+
+typedef union _LARGE_INTEGER
+{
+    struct
+    {
+        DWORD LowPart;
+        LONG  HighPart;
+    };
+    struct
+    {
+        DWORD LowPart;
+        LONG  HighPart;
+    } u;
+
+    LONGLONG QuadPart;
+} LARGE_INTEGER;
+
+/* ============================================================
+ * CRITICAL_SECTION
+ *
+ * pthread mutex is used underneath.
+ * ============================================================ */
+
+typedef struct _CRITICAL_SECTION
+{
+    pthread_mutex_t mutex;
+    bool initialized;
+} CRITICAL_SECTION;
+
+/* ============================================================
+ * Win32-style memory helpers
+ * ============================================================ */
+
+#ifndef ZeroMemory
+#define ZeroMemory(Destination, Length) \
+    memset((Destination), 0, (Length))
+#endif
+
+#ifndef CopyMemory
+#define CopyMemory(Destination, Source, Length) \
+    memcpy((Destination), (Source), (Length))
+#endif
+
+/* ============================================================
+ * Win32 synchronization API
+ *
+ * Implemented in compat.cpp.
+ * ============================================================ */
+
+
+void InitializeCriticalSection(
+    CRITICAL_SECTION* lpCriticalSection
+);
+
+int InitializeCriticalSectionAndSpinCount(
+    CRITICAL_SECTION* lpCriticalSection,
+    DWORD dwSpinCount
+);
+
+void DeleteCriticalSection(
+    CRITICAL_SECTION* lpCriticalSection
+);
+
+void EnterCriticalSection(
+    CRITICAL_SECTION* lpCriticalSection
+);
+
+BOOL TryEnterCriticalSection(
+    CRITICAL_SECTION* lpCriticalSection
+);
+
+void LeaveCriticalSection(
+    CRITICAL_SECTION* lpCriticalSection
+);
+
+/* ============================================================
+ * Event / thread functions
+ * ============================================================ */
+
+HANDLE CreateEvent(
+    void* lpEventAttributes,
+    BOOL bManualReset,
+    BOOL bInitialState,
+    LPCWSTR lpName
+);
+
+BOOL SetEvent(HANDLE hEvent);
+BOOL ResetEvent(HANDLE hEvent);
+
+DWORD WaitForSingleObject(
+    HANDLE hHandle,
+    DWORD dwMilliseconds
+);
+
+DWORD WaitForMultipleObjects(
+    DWORD nCount,
+    const HANDLE* lpHandles,
+    BOOL bWaitAll,
+    DWORD dwMilliseconds
+);
+
+BOOL CloseHandle(HANDLE hObject);
+
+DWORD GetCurrentThreadId(void);
+
+BOOL GetExitCodeThread(
+    HANDLE hThread,
+    DWORD* lpExitCode
+);
+
+HANDLE CreateThread(
+    void* lpThreadAttributes,
+    SIZE_T dwStackSize,
+    DWORD (*lpStartAddress)(LPVOID),
+    LPVOID lpParameter,
+    DWORD dwCreationFlags,
+    DWORD* lpThreadId
+);
+
+BOOL SetThreadPriority(
+    HANDLE hThread,
+    int nPriority
+);
+
+SIZE_T SetThreadAffinityMask(
+    HANDLE hThread,
+    SIZE_T dwThreadAffinityMask
+);
+
+void Sleep(DWORD dwMilliseconds);
+
+/* ============================================================
+ * Win32 wait constants
+ * ============================================================ */
+
+#ifndef WAIT_OBJECT_0
+#define WAIT_OBJECT_0       0x00000000L
+#endif
+
+#ifndef WAIT_ABANDONED
+#define WAIT_ABANDONED      0x00000080L
+#endif
+
+#ifndef WAIT_TIMEOUT
+#define WAIT_TIMEOUT        0x00000102L
+#endif
+
+#ifndef WAIT_FAILED
+#define WAIT_FAILED         0xFFFFFFFFL
+#endif
+
+#ifndef INFINITE
+#define INFINITE            0xFFFFFFFFL
+#endif
+
+/* ============================================================
+ * HRESULT helpers
+ * ============================================================ */
+
+#ifndef S_OK
+#define S_OK ((HRESULT)0L)
+#endif
+
+#ifndef E_FAIL
+#define E_FAIL ((HRESULT)0x80004005L)
+#endif
+
+#ifndef E_INVALIDARG
+#define E_INVALIDARG ((HRESULT)0x80070057L)
+#endif
+
+#ifndef FAILED
+#define FAILED(hr) (((HRESULT)(hr)) < 0)
+#endif
+
+#ifndef SUCCEEDED
+#define SUCCEEDED(hr) (((HRESULT)(hr)) >= 0)
+#endif
+
+/* Basic Windows / x86 typedefs */
+typedef float               FLOAT;
+typedef int                 INT;
+typedef void*               PVOID;
+typedef unsigned long long  __uint64;
+
+/* Additional Win32 pointer typedefs */
+typedef CHAR*               LPSTR;
+typedef const CHAR*         LPCSTR;
+typedef BYTE*               LPBYTE;
+typedef WORD*               LPWORD;
+typedef DWORD*              LPDWORD;
+
+typedef short               SHORT;
+
+/* Platform mock types (Android / Xbox forward declarations) */
+#include "platform_android_types.h"
+
+/* Win32 performance counters (POSIX-backed, LARGE_INTEGER signatures) */
+static inline BOOL QueryPerformanceFrequency(LARGE_INTEGER* lpFrequency) {
+    if (lpFrequency) lpFrequency->QuadPart = 1000000000LL;
+    return TRUE;
+}
+static inline BOOL QueryPerformanceCounter(LARGE_INTEGER* lpPerformanceCount) {
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+    if (lpPerformanceCount) {
+        lpPerformanceCount->QuadPart = (LONGLONG)ts.tv_sec * 1000000000LL
+                                     + (LONGLONG)ts.tv_nsec;
+    }
+    return TRUE;
+}
+
+/* Global app instance (defined in Client; World only needs extern) */
+#ifdef __cplusplus
+class CMinecraftApp;
+extern CMinecraftApp app;
+#endif
+
+/* MSVC __debugbreak intrinsic -> Clang/GCC builtin */
+#ifndef __debugbreak
+#define __debugbreak() __builtin_trap()
+#endif
+
+#include "compat_win32_file.h"
+
+
+/* Win32 time APIs (POSIX-backed) */
+typedef struct _SYSTEMTIME {
+    WORD wYear;
+    WORD wMonth;
+    WORD wDayOfWeek;
+    WORD wDay;
+    WORD wHour;
+    WORD wMinute;
+    WORD wSecond;
+    WORD wMilliseconds;
+} SYSTEMTIME;
+
+static inline DWORD GetTickCount(void) {
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+    return (DWORD)((unsigned long long)ts.tv_sec * 1000ULL
+                 + (unsigned long long)ts.tv_nsec / 1000000ULL);
+}
+
+static inline void GetLocalTime(SYSTEMTIME* st) {
+    if (!st) return;
+    time_t t = time(NULL);
+    struct tm lt;
+    localtime_r(&t, &lt);
+    st->wYear = lt.tm_year + 1900;
+    st->wMonth = lt.tm_mon + 1;
+    st->wDayOfWeek = lt.tm_wday;
+    st->wDay = lt.tm_mday;
+    st->wHour = lt.tm_hour;
+    st->wMinute = lt.tm_min;
+    st->wSecond = lt.tm_sec;
+    st->wMilliseconds = 0;
+}
+
+static inline void GetSystemTime(SYSTEMTIME* st) {
+    if (!st) return;
+    time_t t = time(NULL);
+    struct tm gt;
+    gmtime_r(&t, &gt);
+    st->wYear = gt.tm_year + 1900;
+    st->wMonth = gt.tm_mon + 1;
+    st->wDayOfWeek = gt.tm_wday;
+    st->wDay = gt.tm_mday;
+    st->wHour = gt.tm_hour;
+    st->wMinute = gt.tm_min;
+    st->wSecond = gt.tm_sec;
+    st->wMilliseconds = 0;
+}
+
+
+/* Win32 FILETIME <-> SYSTEMTIME (Windows epoch = 1601-01-01, 100ns ticks) */
+#ifndef _WIN32_EPOCH_DELTA_SECONDS
+#define _WIN32_EPOCH_DELTA_SECONDS 11644473600ULL
+#endif
+
+static inline BOOL SystemTimeToFileTime(const SYSTEMTIME* st, FILETIME* ft) {
+    if (!st || !ft) return FALSE;
+    struct tm tm;
+    memset(&tm, 0, sizeof(tm));
+    tm.tm_year = (int)st->wYear - 1900;
+    tm.tm_mon  = (int)st->wMonth - 1;
+    tm.tm_mday = (int)st->wDay;
+    tm.tm_hour = (int)st->wHour;
+    tm.tm_min  = (int)st->wMinute;
+    tm.tm_sec  = (int)st->wSecond;
+    time_t t = timegm(&tm);
+    unsigned long long ticks =
+        ((unsigned long long)t + _WIN32_EPOCH_DELTA_SECONDS) * 10000000ULL
+        + (unsigned long long)st->wMilliseconds * 10000ULL;
+    ft->dwLowDateTime  = (DWORD)(ticks & 0xFFFFFFFFULL);
+    ft->dwHighDateTime = (DWORD)(ticks >> 32);
+    return TRUE;
+}
+
+static inline BOOL FileTimeToSystemTime(const FILETIME* ft, SYSTEMTIME* st) {
+    if (!ft || !st) return FALSE;
+    unsigned long long ticks =
+        ((unsigned long long)ft->dwHighDateTime << 32) | ft->dwLowDateTime;
+    unsigned long long secs = ticks / 10000000ULL;
+    unsigned long long ms   = (ticks % 10000000ULL) / 10000ULL;
+    time_t t = (time_t)(secs - _WIN32_EPOCH_DELTA_SECONDS);
+    struct tm gt;
+    gmtime_r(&t, &gt);
+    st->wYear         = (WORD)(gt.tm_year + 1900);
+    st->wMonth        = (WORD)(gt.tm_mon + 1);
+    st->wDayOfWeek    = (WORD)gt.tm_wday;
+    st->wDay          = (WORD)gt.tm_mday;
+    st->wHour         = (WORD)gt.tm_hour;
+    st->wMinute       = (WORD)gt.tm_min;
+    st->wSecond       = (WORD)gt.tm_sec;
+    st->wMilliseconds = (WORD)ms;
+    return TRUE;
+}
+
+
+/* Xbox 360 XDK memory intrinsics — map to standard C library */
+#ifndef XMemCpy
+static inline void* XMemCpy(void* dst, const void* src, size_t n) {
+    return memcpy(dst, src, n);
+}
+#endif
+#ifndef XMemSet
+static inline void* XMemSet(void* dst, int v, size_t n) {
+    return memset(dst, v, n);
+}
+#endif
+#ifndef XMemCmp
+static inline int XMemCmp(const void* a, const void* b, size_t n) {
+    return memcmp(a, b, n);
+}
+#endif
+#ifndef XMemMove
+static inline void* XMemMove(void* dst, const void* src, size_t n) {
+    return memmove(dst, src, n);
+}
+#endif
+
+
+/* ============================================================
+ * Win32 Thread-Local Storage (pthread-backed)
+ * ============================================================ */
+#ifndef TLS_OUT_OF_INDEXES
+#define TLS_OUT_OF_INDEXES ((DWORD)0xFFFFFFFF)
+#endif
+#ifndef TLS_MINIMUM_AVAILABLE
+#define TLS_MINIMUM_AVAILABLE 64
+#endif
+
+#define COMPAT_TLS_SLOTS 64
+static inline DWORD TlsAlloc(void) {
+    static __thread int _dummy;
+    (void)_dummy;
+    static volatile int _next = 0;
+    int id = __sync_fetch_and_add(&_next, 1);
+    if (id >= COMPAT_TLS_SLOTS) return TLS_OUT_OF_INDEXES;
+    return (DWORD)(id + 1);  /* 0 is reserved as invalid */
+}
+
+static inline BOOL TlsSetValue(DWORD idx, LPVOID val) {
+    if (idx == 0 || idx > COMPAT_TLS_SLOTS) return FALSE;
+    static __thread LPVOID _slots[COMPAT_TLS_SLOTS + 1];
+    _slots[idx] = val;
+    return TRUE;
+}
+
+static inline LPVOID TlsGetValue(DWORD idx) {
+    if (idx == 0 || idx > COMPAT_TLS_SLOTS) return NULL;
+    static __thread LPVOID _slots[COMPAT_TLS_SLOTS + 1];
+    return _slots[idx];
+}
+
+static inline BOOL TlsFree(DWORD idx) {
+    (void)idx;
+    return TRUE;
+}
+
+/* ============================================================
+ * PIX profiling markers — no-op on Android
+ * ============================================================ */
+#ifndef PIXBeginNamedEvent
+#define PIXBeginNamedEvent(...)  ((void)0)
+#endif
+#ifndef PIXEndNamedEvent
+#define PIXEndNamedEvent(...)    ((void)0)
+#endif
+#ifndef PIXBeginEvent
+#define PIXBeginEvent(...)       ((void)0)
+#endif
+#ifndef PIXEndEvent
+#define PIXEndEvent(...)         ((void)0)
+#endif
+
+/* ============================================================
+ * Xbox 360 LZX compression API stubs
+ * Real implementation deferred to a later phase (Phase 6).
+ * Signatures preserved; behaviour returns failure.
+ * ============================================================ */
+#ifndef XMEMCODEC_LZX
+#define XMEMCODEC_LZX 0x0001
+#endif
+
+typedef struct _XMEMCODEC_PARAMETERS_LZX {
+    unsigned int Flags;
+    unsigned int WindowSize;
+    unsigned int CompressionPartitionSize;
+} XMEMCODEC_PARAMETERS_LZX;
+
+typedef void* XMEMCOMPRESSION_CONTEXT;
+typedef void* XMEMDECOMPRESSION_CONTEXT;
+
+static inline int XMemCreateCompressionContext(unsigned int codec,
+                                              const XMEMCODEC_PARAMETERS_LZX* params,
+                                              unsigned int flags,
+                                              XMEMCOMPRESSION_CONTEXT* ctx) {
+    (void)codec; (void)params; (void)flags;
+    if (ctx) *ctx = NULL;
+    return 0;  /* failure — real impl TBD */
+}
+
+static inline int XMemCreateDecompressionContext(unsigned int codec,
+                                                const XMEMCODEC_PARAMETERS_LZX* params,
+                                                unsigned int flags,
+                                                XMEMDECOMPRESSION_CONTEXT* ctx) {
+    (void)codec; (void)params; (void)flags;
+    if (ctx) *ctx = NULL;
+    return 0;
+}
+
+static inline void XMemDestroyCompressionContext(XMEMCOMPRESSION_CONTEXT ctx) { (void)ctx; }
+static inline void XMemDestroyDecompressionContext(XMEMDECOMPRESSION_CONTEXT ctx) { (void)ctx; }
+
+static inline int XMemCompress(XMEMCOMPRESSION_CONTEXT ctx,
+                               void* dst, SIZE_T* dstSize,
+                               const void* src, SIZE_T srcSize) {
+    (void)ctx; (void)dst; (void)src; (void)srcSize;
+    if (dstSize) *dstSize = 0;
+    return 0;
+}
+static inline int XMemCompress(XMEMCOMPRESSION_CONTEXT ctx,
+                               void* dst, DWORD* dstSize,
+                               const void* src, DWORD srcSize) {
+    (void)ctx; (void)dst; (void)src; (void)srcSize;
+    if (dstSize) *dstSize = 0;
+    return 0;
+}
+
+static inline int XMemDecompress(XMEMDECOMPRESSION_CONTEXT ctx,
+                                 void* dst, SIZE_T* dstSize,
+                                 const void* src, SIZE_T srcSize) {
+    (void)ctx; (void)dst; (void)src; (void)srcSize;
+    if (dstSize) *dstSize = 0;
+    return 0;
+}
+static inline int XMemDecompress(XMEMDECOMPRESSION_CONTEXT ctx,
+                                 void* dst, DWORD* dstSize,
+                                 const void* src, DWORD srcSize) {
+    (void)ctx; (void)dst; (void)src; (void)srcSize;
+    if (dstSize) *dstSize = 0;
+    return 0;
+}
+
+
+/* Win32 fixed-width signed integers */
+#ifndef __int8
+typedef signed char         __int8;
+#endif
+#ifndef __int16
+typedef short               __int16;
+#endif
+#ifndef __int32
+typedef int                 __int32;
+#endif
+#ifndef __int64
+typedef long long           __int64;
+#endif
+
+/* Xbox 360 XDK lock-free stack — fallback stub.
+ * Real semantics matter only for concurrent tile storage;
+ * single-threaded fallback is sufficient for compilation and initial boot. */
+#ifdef __cplusplus
+template<typename T, int Alignment = 4>
+class XLockFreeStack {
+public:
+    XLockFreeStack() {}
+    ~XLockFreeStack() {}
+    void Push(T* /*item*/) {}
+    T*   Pop()    { return nullptr; }
+    T*   PopAll() { return nullptr; }
+    bool IsEmpty() const { return true; }
+    void Purge() {}
+};
+#endif
+
+
+/* Xbox LIVE XUID constants */
+#ifndef INVALID_XUID
+#define INVALID_XUID        ((PlayerUID)0ULL)
+#endif
+#ifndef XUSER_INDEX_ANY
+#define XUSER_INDEX_ANY     0x000000FF
+#endif
+/* Xbox 360 system XUID prefix (0xE000...) */
+#ifndef XUID_OFFLINE_PREFIX
+#define XUID_OFFLINE_PREFIX 0xE000000000000000ULL
+#endif
+#ifndef XUID_ONLINE_PREFIX
+#define XUID_ONLINE_PREFIX  0x0000000000000000ULL
+#endif
+
+/* PlayerUID is defined in Minecraft.World/stdafx.h.
+ * Ensure it is visible here before using it. */
+#ifndef COMPAT_PLAYERUID_DEFINED
+typedef unsigned long long PlayerUID;
+#define COMPAT_PLAYERUID_DEFINED 1
+#endif
+
+
+/* ============================================================
+ * Game string IDs (IDS_*) — fallback defaults.
+ * On real platforms these come from the XUI string table.
+ * On Android they will be replaced by the platform string table.
+ * Values are arbitrary unique integers; only uniqueness matters here.
+ * ============================================================ */
+#ifndef IDS_TILE_BED_NOT_VALID
+#define IDS_TILE_BED_NOT_VALID        7001
+#endif
+#ifndef IDS_GAME_MODE_CHANGED
+#define IDS_GAME_MODE_CHANGED         7002
+#endif
+#ifndef IDS_GAME_MODE_CHANGED_TO
+#define IDS_GAME_MODE_CHANGED_TO      7003
+#endif
+#ifndef IDS_DEFAULT_SAVENAME
+#define IDS_DEFAULT_SAVENAME          7004
+#endif
+#ifndef IDS_GAMENAME
+#define IDS_GAMENAME                  7005
+#endif
+#ifndef IDS_SAVECACHEFILE
+#define IDS_SAVECACHEFILE             7006
+#endif
+#ifndef IDS_OPTIONSFILE
+#define IDS_OPTIONSFILE               7007
+#endif
+
+
+/* ============================================================
+ * Network protocol version constants.
+ * Real value from Minecraft: Legacy Console Edition TU25 protocol.
+ * Used by PreLoginPacket and Connection for handshake.
+ * ============================================================ */
+#ifndef MINECRAFT_NET_VERSION
+#define MINECRAFT_NET_VERSION   0x0000004D  /* 77 — placeholder matching TU25 */
+#endif
+#ifndef MINECRAFT_NET_VERSION_MIN
+#define MINECRAFT_NET_VERSION_MIN  MINECRAFT_NET_VERSION
+#endif
+
+#endif /* COMPAT_H */

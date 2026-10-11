@@ -1,0 +1,22 @@
+/* Linux/Android CConsoleMinecraftApp — minimal impls, no PSN/TMS. */
+#include "stdafx.h"
+#include "Linux_App.h"
+
+/* The concrete platform app object. `app` (in compat.h) is a reference to it
+ * typed as CMinecraftApp&, so all TUs see the base class interface. */
+CConsoleMinecraftApp g_consoleApp;
+CMinecraftApp& app = g_consoleApp;
+
+CConsoleMinecraftApp::CConsoleMinecraftApp() : CMinecraftApp() {}
+CConsoleMinecraftApp::~CConsoleMinecraftApp() {}
+
+void CConsoleMinecraftApp::SetRichPresenceContext(int, int) {}
+void CConsoleMinecraftApp::CaptureSaveThumbnail() {}
+void CConsoleMinecraftApp::GetSaveThumbnail(PBYTE*, DWORD*) {}
+void CConsoleMinecraftApp::ReleaseSaveThumbnail() {}
+void CConsoleMinecraftApp::GetScreenshot(int, PBYTE*, DWORD*) {}
+void CConsoleMinecraftApp::ReadBannedList(int, eTMSAction, bool) {}
+int  CConsoleMinecraftApp::LoadLocalTMSFile(WCHAR*) { return -1; }
+int  CConsoleMinecraftApp::LoadLocalTMSFile(WCHAR*, eFileExtensionType) { return -1; }
+void CConsoleMinecraftApp::FreeLocalTMSFiles(eTMSFileType) {}
+int  CConsoleMinecraftApp::GetLocalTMSFileIndex(WCHAR*, bool, eFileExtensionType) { return -1; }

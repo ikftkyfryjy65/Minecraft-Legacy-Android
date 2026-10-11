@@ -1,0 +1,281 @@
+#ifndef COMPAT_H
+#define COMPAT_H
+
+#include <stdint.h>
+#include <stddef.h>
+#include <string.h>
+
+#include <pthread.h>
+#include <unistd.h>
+#include <time.h>
+#include <errno.h>
+
+/*
+ * Minimal Win32/Xbox compatibility layer
+ * Target: Linux / Android
+ */
+
+/* ============================================================
+ * Basic Windows types
+ * ============================================================ */
+
+typedef unsigned char       BYTE;
+typedef unsigned short      WORD;
+typedef unsigned int        DWORD;
+typedef unsigned int        UINT;
+typedef unsigned long       ULONG;
+typedef unsigned long long  ULONGLONG;
+typedef unsigned long long  ULONG_PTR;
+
+typedef long                LONG;
+typedef long long           LONGLONG;
+typedef long long           __int64;
+
+typedef int                 BOOL;
+
+typedef void                VOID;
+typedef void*               LPVOID;
+typedef const void*         LPCVOID;
+
+typedef char                CHAR;
+typedef wchar_t             WCHAR;
+
+typedef WCHAR*              LPWSTR;
+typedef const WCHAR*        LPCWSTR;
+
+typedef BYTE*               PBYTE;
+
+typedef size_t              SIZE_T;
+
+/*
+ * HRESULT
+ */
+typedef long HRESULT;
+
+/* ============================================================
+ * Common constants
+ * ============================================================ */
+
+#ifndef FALSE
+#define FALSE 0
+#endif
+
+#ifndef TRUE
+#define TRUE 1
+#endif
+
+#ifndef NULL
+#define NULL 0
+#endif
+
+#ifndef WINAPI
+#define WINAPI
+#endif
+
+#ifndef CALLBACK
+#define CALLBACK
+#endif
+
+#ifndef APIENTRY
+#define APIENTRY
+#endif
+
+/* ============================================================
+ * HANDLE
+ *
+ * We don't use a real Win32 HANDLE on Android.
+ * The actual compatibility implementation will live in
+ * compat.cpp.
+ * ============================================================ */
+
+typedef void* HANDLE;
+
+/* ============================================================
+ * FILETIME
+ * ============================================================ */
+
+typedef struct _FILETIME
+{
+    DWORD dwLowDateTime;
+    DWORD dwHighDateTime;
+} FILETIME;
+
+/* ============================================================
+ * LARGE_INTEGER
+ * ============================================================ */
+
+typedef union _LARGE_INTEGER
+{
+    struct
+    {
+        DWORD LowPart;
+        LONG  HighPart;
+    } u;
+
+    LONGLONG QuadPart;
+
+} LARGE_INTEGER;
+
+/* ============================================================
+ * CRITICAL_SECTION
+ *
+ * pthread mutex is used underneath.
+ * ============================================================ */
+
+typedef struct _CRITICAL_SECTION
+{
+    pthread_mutex_t mutex;
+    bool initialized;
+} CRITICAL_SECTION;
+
+/* ============================================================
+ * Win32-style memory helpers
+ * ============================================================ */
+
+#ifndef ZeroMemory
+#define ZeroMemory(Destination, Length) \
+    memset((Destination), 0, (Length))
+#endif
+
+#ifndef CopyMemory
+#define CopyMemory(Destination, Source, Length) \
+    memcpy((Destination), (Source), (Length))
+#endif
+
+/* ============================================================
+ * Win32 synchronization API
+ *
+ * Implemented in compat.cpp.
+ * ============================================================ */
+
+
+void InitializeCriticalSection(
+    CRITICAL_SECTION* lpCriticalSection
+);
+
+int InitializeCriticalSectionAndSpinCount(
+    CRITICAL_SECTION* lpCriticalSection,
+    DWORD dwSpinCount
+);
+
+void DeleteCriticalSection(
+    CRITICAL_SECTION* lpCriticalSection
+);
+
+void EnterCriticalSection(
+    CRITICAL_SECTION* lpCriticalSection
+);
+
+BOOL TryEnterCriticalSection(
+    CRITICAL_SECTION* lpCriticalSection
+);
+
+void LeaveCriticalSection(
+    CRITICAL_SECTION* lpCriticalSection
+);
+
+/* ============================================================
+ * Event / thread functions
+ * ============================================================ */
+
+HANDLE CreateEvent(
+    void* lpEventAttributes,
+    BOOL bManualReset,
+    BOOL bInitialState,
+    LPCWSTR lpName
+);
+
+BOOL SetEvent(HANDLE hEvent);
+BOOL ResetEvent(HANDLE hEvent);
+
+DWORD WaitForSingleObject(
+    HANDLE hHandle,
+    DWORD dwMilliseconds
+);
+
+DWORD WaitForMultipleObjects(
+    DWORD nCount,
+    const HANDLE* lpHandles,
+    BOOL bWaitAll,
+    DWORD dwMilliseconds
+);
+
+BOOL CloseHandle(HANDLE hObject);
+
+DWORD GetCurrentThreadId(void);
+
+BOOL GetExitCodeThread(
+    HANDLE hThread,
+    DWORD* lpExitCode
+);
+
+HANDLE CreateThread(
+    void* lpThreadAttributes,
+    SIZE_T dwStackSize,
+    DWORD (*lpStartAddress)(LPVOID),
+    LPVOID lpParameter,
+    DWORD dwCreationFlags,
+    DWORD* lpThreadId
+);
+
+BOOL SetThreadPriority(
+    HANDLE hThread,
+    int nPriority
+);
+
+SIZE_T SetThreadAffinityMask(
+    HANDLE hThread,
+    SIZE_T dwThreadAffinityMask
+);
+
+void Sleep(DWORD dwMilliseconds);
+
+/* ============================================================
+ * Win32 wait constants
+ * ============================================================ */
+
+#ifndef WAIT_OBJECT_0
+#define WAIT_OBJECT_0       0x00000000L
+#endif
+
+#ifndef WAIT_ABANDONED
+#define WAIT_ABANDONED      0x00000080L
+#endif
+
+#ifndef WAIT_TIMEOUT
+#define WAIT_TIMEOUT        0x00000102L
+#endif
+
+#ifndef WAIT_FAILED
+#define WAIT_FAILED         0xFFFFFFFFL
+#endif
+
+#ifndef INFINITE
+#define INFINITE            0xFFFFFFFFL
+#endif
+
+/* ============================================================
+ * HRESULT helpers
+ * ============================================================ */
+
+#ifndef S_OK
+#define S_OK ((HRESULT)0L)
+#endif
+
+#ifndef E_FAIL
+#define E_FAIL ((HRESULT)0x80004005L)
+#endif
+
+#ifndef E_INVALIDARG
+#define E_INVALIDARG ((HRESULT)0x80070057L)
+#endif
+
+#ifndef FAILED
+#define FAILED(hr) (((HRESULT)(hr)) < 0)
+#endif
+
+#ifndef SUCCEEDED
+#define SUCCEEDED(hr) (((HRESULT)(hr)) >= 0)
+#endif
+
+#endif /* COMPAT_H */

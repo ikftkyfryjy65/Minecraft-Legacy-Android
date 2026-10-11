@@ -1,0 +1,23 @@
+#pragma once
+#include "../Common/UI/IUIController.h"
+/* Linux/Android: minimal ConsoleUIController. Inherits from the same
+ * abstract base as Xbox/Windows64. Full UI integration is Phase 5+. */
+class ConsoleUIController : public IUIController
+{
+public:
+    virtual void init();
+    virtual void tick();
+    virtual void render();
+    virtual void StartReloadSkinThread();
+    virtual bool IsReloadingSkin();
+    virtual void CleanUpSkinReload();
+    virtual bool NavigateToScene(int iPad, EUIScene scene, void *initData = 0, EUILayer layer = eUILayer_Scene, EUIGroup group = eUIGroup_PAD);
+    virtual bool NavigateBack(int iPad, bool forceUsePad = false, EUIScene eScene = eUIScene_COUNT, EUILayer eLayer = eUILayer_COUNT);
+    virtual void NavigateToHomeMenu();
+    virtual void CloseUIScenes(int iPad, bool forceIPad = false);
+    virtual void CloseAllPlayersScenes();
+    virtual bool IsPauseMenuDisplayed(int iPad);
+    virtual void logDebugString(const wchar_t* fmt, ...);
+    virtual void logDebugString(const char* fmt, ...);
+};
+extern ConsoleUIController ui;

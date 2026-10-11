@@ -1,0 +1,27 @@
+#ifndef MOCK_QNET_H
+#define MOCK_QNET_H
+
+/* QNet send flags (Xbox 360 QNet). Values are opaque. */
+#ifndef QNET_SENDDATA_RELIABLE
+#define QNET_SENDDATA_RELIABLE       0x00000001u
+#endif
+#ifndef QNET_SENDDATA_SEQUENTIAL
+#define QNET_SENDDATA_SEQUENTIAL     0x00000002u
+#endif
+#ifndef QNET_SENDDATA_LOW_PRIORITY
+#define QNET_SENDDATA_LOW_PRIORITY   0x00000004u
+#endif
+#ifndef QNET_SENDDATA_SECONDARY
+#define QNET_SENDDATA_SECONDARY      0x00000008u
+#endif
+#ifndef QNET_SENDDATA_UNRELIABLE
+#define QNET_SENDDATA_UNRELIABLE     0x00000010u
+#endif
+#ifndef QNET_SENDDATA_NONSEQUENTIAL
+#define QNET_SENDDATA_NONSEQUENTIAL  0x00000020u
+#endif
+
+/* Any file that includes qnet.h expects INetworkPlayer to be fully usable. */
+#include "xrnm.h"
+
+#endif /* MOCK_QNET_H */

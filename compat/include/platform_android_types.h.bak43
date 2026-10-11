@@ -1,0 +1,92 @@
+#ifndef PLATFORM_ANDROID_TYPES_H
+#define PLATFORM_ANDROID_TYPES_H
+
+/* Opaque Xbox LIVE / marketplace types */
+struct XMARKETPLACE_CONTENTOFFER_INFO;
+typedef XMARKETPLACE_CONTENTOFFER_INFO* PXMARKETPLACE_CONTENTOFFER_INFO;
+
+struct XCONTENT_DATA;
+typedef XCONTENT_DATA* PXCONTENT_DATA;
+
+/* XUI handle (opaque) */
+typedef void* HXUIOBJ;
+
+/* Xbox invite info (opaque) */
+struct INVITE_INFO;
+typedef struct INVITE_INFO INVITE_INFO;
+
+/* Xbox friends / session info (opaque) */
+struct FriendSessionInfo;
+typedef struct FriendSessionInfo FriendSessionInfo;
+
+/* 4J thread start function (matches World/C4JThread.h) */
+typedef int (C4JThreadStartFunc)(void* lpThreadParameter);
+
+/* Xbox LIVE constants */
+#ifndef XUSER_INDEX_ANY
+#define XUSER_INDEX_ANY                     0x000000FF
+#endif
+
+#ifndef XUSER_MAX_COUNT
+#define XUSER_MAX_COUNT                     4
+#endif
+
+#ifndef XMARKETPLACE_OFFERING_TYPE_CONTENT
+#define XMARKETPLACE_OFFERING_TYPE_CONTENT  0x00000001
+#endif
+
+/* Xbox user sign-in info: full definition (used as array) */
+typedef struct XUSER_SIGNIN_INFO {
+    unsigned long long xuid;
+    unsigned int       dwInfoFlags;
+    unsigned int       dwUserSigninState;
+    unsigned char      _opaque[192];
+} XUSER_SIGNIN_INFO;
+
+#ifdef __cplusplus
+/* ============================================================
+ * C++ stubs: 4J / Xbox / Sentient types sufficient to compile
+ * ============================================================ */
+
+class C_4JProfile {
+public:
+    struct PROFILESETTINGS;
+};
+struct C_4JProfile::PROFILESETTINGS {
+    unsigned char _opaque[256];
+};
+
+enum eUpsellType     { eUpsellType_Undefined     = 0 };
+enum eUpsellResponse { eUpsellResponse_Undefined = 0 };
+
+enum ESen_FriendOrMatch    { eSen_FriendOrMatch_Unknown    = 0, ESen_FriendOrMatch_Undefined = 0 };
+enum ESen_CompeteOrCoop    { ESen_CompeteOrCoop_Undefined    = 0 };
+enum ESen_LevelExitStatus  { ESen_LevelExitStatus_Undefined  = 0 };
+enum ESen_MediaDestination { ESen_MediaDestination_Undefined = 0 };
+enum ESen_MediaType        { ESen_MediaType_Undefined        = 0 };
+enum ESen_UpsellID         { ESen_UpsellID_Undefined         = 0 };
+enum ESen_UpsellOutcome    { ESen_UpsellOutcome_Undefined    = 0 };
+enum ETelemetryChallenges {
+    eTelemetryChallenges_Unknown   = 0,
+    eTelemetryChallenges_None      = 0,
+    ETelemetryChallenges_Undefined = 0
+};
+#endif /* __cplusplus */
+
+
+#ifdef __cplusplus
+/* Network manager global — real type lives in Client; stub here for World. */
+class INetworkPlayer;
+class CGameNetworkManager_Stub {
+public:
+    INetworkPlayer* GetHostPlayer() { return nullptr; }
+    INetworkPlayer* GetPlayerBySmallId(unsigned char /*id*/) { return nullptr; }
+    bool IsLeavingGame() const { return false; }
+    bool IsInSession()   const { return false; }
+    bool IsHost()        const { return true; }
+    int  GetPlayerCount() const { return 1; }
+};
+extern CGameNetworkManager_Stub g_NetworkManager;
+#endif
+
+#endif /* PLATFORM_ANDROID_TYPES_H */

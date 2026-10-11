@@ -1,0 +1,3169 @@
+#ifndef COMPAT_H
+#define COMPAT_H
+
+#include <stdint.h>
+#include <stddef.h>
+#include <string.h>
+
+#include <pthread.h>
+#include <unistd.h>
+#include <time.h>
+#include <errno.h>
+
+/*
+ * Minimal Win32/Xbox compatibility layer
+ * Target: Linux / Android
+ */
+
+/* ============================================================
+ * Basic Windows types
+ * ============================================================ */
+
+typedef unsigned char       BYTE;
+typedef unsigned short      WORD;
+typedef unsigned int        DWORD;
+typedef unsigned int        UINT;
+typedef unsigned long       ULONG;
+typedef unsigned long long  ULONGLONG;
+typedef unsigned long long  ULONG_PTR;
+
+typedef long                LONG;
+typedef long long           LONGLONG;
+typedef long long           __int64;
+
+typedef int                 BOOL;
+
+typedef void                VOID;
+typedef void*               LPVOID;
+typedef const void*         LPCVOID;
+
+typedef char                CHAR;
+typedef wchar_t             WCHAR;
+
+typedef WCHAR*              LPWSTR;
+typedef const WCHAR*        LPCWSTR;
+
+typedef BYTE*               PBYTE;
+
+typedef size_t              SIZE_T;
+
+/*
+ * HRESULT
+ */
+typedef long HRESULT;
+
+/* ============================================================
+ * Common constants
+ * ============================================================ */
+
+#ifndef FALSE
+#define FALSE 0
+#endif
+
+#ifndef TRUE
+#define TRUE 1
+#endif
+
+#ifndef NULL
+#define NULL 0
+#endif
+
+#ifndef WINAPI
+#define WINAPI
+#endif
+
+#ifndef CALLBACK
+#define CALLBACK
+#endif
+
+#ifndef APIENTRY
+#define APIENTRY
+#endif
+
+/* ============================================================
+ * HANDLE
+ *
+ * We don't use a real Win32 HANDLE on Android.
+ * The actual compatibility implementation will live in
+ * compat.cpp.
+ * ============================================================ */
+
+typedef void* HANDLE;
+
+/* ============================================================
+ * FILETIME
+ * ============================================================ */
+
+typedef struct _FILETIME
+{
+    DWORD dwLowDateTime;
+    DWORD dwHighDateTime;
+} FILETIME;
+
+/* ============================================================
+ * LARGE_INTEGER
+ * ============================================================ */
+
+typedef union _LARGE_INTEGER
+{
+    struct
+    {
+        DWORD LowPart;
+        LONG  HighPart;
+    };
+    struct
+    {
+        DWORD LowPart;
+        LONG  HighPart;
+    } u;
+
+    LONGLONG QuadPart;
+} LARGE_INTEGER;
+
+/* ============================================================
+ * CRITICAL_SECTION
+ *
+ * pthread mutex is used underneath.
+ * ============================================================ */
+
+typedef struct _CRITICAL_SECTION
+{
+    pthread_mutex_t mutex;
+    bool initialized;
+} CRITICAL_SECTION;
+
+/* ============================================================
+ * Win32-style memory helpers
+ * ============================================================ */
+
+#ifndef ZeroMemory
+#define ZeroMemory(Destination, Length) \
+    memset((Destination), 0, (Length))
+#endif
+
+#ifndef CopyMemory
+#define CopyMemory(Destination, Source, Length) \
+    memcpy((Destination), (Source), (Length))
+#endif
+
+/* ============================================================
+ * Win32 synchronization API
+ *
+ * Implemented in compat.cpp.
+ * ============================================================ */
+
+
+void InitializeCriticalSection(
+    CRITICAL_SECTION* lpCriticalSection
+);
+
+int InitializeCriticalSectionAndSpinCount(
+    CRITICAL_SECTION* lpCriticalSection,
+    DWORD dwSpinCount
+);
+
+void DeleteCriticalSection(
+    CRITICAL_SECTION* lpCriticalSection
+);
+
+void EnterCriticalSection(
+    CRITICAL_SECTION* lpCriticalSection
+);
+
+BOOL TryEnterCriticalSection(
+    CRITICAL_SECTION* lpCriticalSection
+);
+
+void LeaveCriticalSection(
+    CRITICAL_SECTION* lpCriticalSection
+);
+
+/* ============================================================
+ * Event / thread functions
+ * ============================================================ */
+
+HANDLE CreateEvent(
+    void* lpEventAttributes,
+    BOOL bManualReset,
+    BOOL bInitialState,
+    LPCWSTR lpName
+);
+
+BOOL SetEvent(HANDLE hEvent);
+BOOL ResetEvent(HANDLE hEvent);
+
+DWORD WaitForSingleObject(
+    HANDLE hHandle,
+    DWORD dwMilliseconds
+);
+
+DWORD WaitForMultipleObjects(
+    DWORD nCount,
+    const HANDLE* lpHandles,
+    BOOL bWaitAll,
+    DWORD dwMilliseconds
+);
+
+BOOL CloseHandle(HANDLE hObject);
+
+DWORD GetCurrentThreadId(void);
+
+BOOL GetExitCodeThread(
+    HANDLE hThread,
+    DWORD* lpExitCode
+);
+
+HANDLE CreateThread(
+    void* lpThreadAttributes,
+    SIZE_T dwStackSize,
+    DWORD (*lpStartAddress)(LPVOID),
+    LPVOID lpParameter,
+    DWORD dwCreationFlags,
+    DWORD* lpThreadId
+);
+
+BOOL SetThreadPriority(
+    HANDLE hThread,
+    int nPriority
+);
+
+SIZE_T SetThreadAffinityMask(
+    HANDLE hThread,
+    SIZE_T dwThreadAffinityMask
+);
+
+void Sleep(DWORD dwMilliseconds);
+
+/* ============================================================
+ * Win32 wait constants
+ * ============================================================ */
+
+#ifndef WAIT_OBJECT_0
+#define WAIT_OBJECT_0       0x00000000L
+#endif
+
+#ifndef WAIT_ABANDONED
+#define WAIT_ABANDONED      0x00000080L
+#endif
+
+#ifndef WAIT_TIMEOUT
+#define WAIT_TIMEOUT        0x00000102L
+#endif
+
+#ifndef WAIT_FAILED
+#define WAIT_FAILED         0xFFFFFFFFL
+#endif
+
+#ifndef INFINITE
+#define INFINITE            0xFFFFFFFFL
+#endif
+
+/* ============================================================
+ * HRESULT helpers
+ * ============================================================ */
+
+#ifndef S_OK
+#define S_OK ((HRESULT)0L)
+#endif
+
+#ifndef E_FAIL
+#define E_FAIL ((HRESULT)0x80004005L)
+#endif
+
+#ifndef E_INVALIDARG
+#define E_INVALIDARG ((HRESULT)0x80070057L)
+#endif
+
+#ifndef FAILED
+#define FAILED(hr) (((HRESULT)(hr)) < 0)
+#endif
+
+#ifndef SUCCEEDED
+#define SUCCEEDED(hr) (((HRESULT)(hr)) >= 0)
+#endif
+
+/* Basic Windows / x86 typedefs */
+typedef float               FLOAT;
+typedef int                 INT;
+typedef void*               PVOID;
+typedef unsigned long long  __uint64;
+
+/* Additional Win32 pointer typedefs */
+typedef CHAR*               LPSTR;
+typedef const CHAR*         LPCSTR;
+typedef BYTE*               LPBYTE;
+typedef WORD*               LPWORD;
+typedef DWORD*              LPDWORD;
+
+typedef short               SHORT;
+
+/* Platform mock types (Android / Xbox forward declarations) */
+#include "platform_android_types.h"
+
+/* Win32 performance counters (POSIX-backed, LARGE_INTEGER signatures) */
+static inline BOOL QueryPerformanceFrequency(LARGE_INTEGER* lpFrequency) {
+    if (lpFrequency) lpFrequency->QuadPart = 1000000000LL;
+    return TRUE;
+}
+static inline BOOL QueryPerformanceCounter(LARGE_INTEGER* lpPerformanceCount) {
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+    if (lpPerformanceCount) {
+        lpPerformanceCount->QuadPart = (LONGLONG)ts.tv_sec * 1000000000LL
+                                     + (LONGLONG)ts.tv_nsec;
+    }
+    return TRUE;
+}
+
+/* Global app instance (defined in Client; World only needs extern) */
+#ifdef __cplusplus
+class CMinecraftApp;
+extern CMinecraftApp app;
+#endif
+
+/* MSVC __debugbreak intrinsic -> Clang/GCC builtin */
+#ifndef __debugbreak
+#define __debugbreak() __builtin_trap()
+#endif
+
+#include "compat_win32_file.h"
+
+
+/* Win32 time APIs (POSIX-backed) */
+typedef struct _SYSTEMTIME {
+    WORD wYear;
+    WORD wMonth;
+    WORD wDayOfWeek;
+    WORD wDay;
+    WORD wHour;
+    WORD wMinute;
+    WORD wSecond;
+    WORD wMilliseconds;
+} SYSTEMTIME;
+
+static inline DWORD GetTickCount(void) {
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+    return (DWORD)((unsigned long long)ts.tv_sec * 1000ULL
+                 + (unsigned long long)ts.tv_nsec / 1000000ULL);
+}
+
+static inline void GetLocalTime(SYSTEMTIME* st) {
+    if (!st) return;
+    time_t t = time(NULL);
+    struct tm lt;
+    localtime_r(&t, &lt);
+    st->wYear = lt.tm_year + 1900;
+    st->wMonth = lt.tm_mon + 1;
+    st->wDayOfWeek = lt.tm_wday;
+    st->wDay = lt.tm_mday;
+    st->wHour = lt.tm_hour;
+    st->wMinute = lt.tm_min;
+    st->wSecond = lt.tm_sec;
+    st->wMilliseconds = 0;
+}
+
+static inline void GetSystemTime(SYSTEMTIME* st) {
+    if (!st) return;
+    time_t t = time(NULL);
+    struct tm gt;
+    gmtime_r(&t, &gt);
+    st->wYear = gt.tm_year + 1900;
+    st->wMonth = gt.tm_mon + 1;
+    st->wDayOfWeek = gt.tm_wday;
+    st->wDay = gt.tm_mday;
+    st->wHour = gt.tm_hour;
+    st->wMinute = gt.tm_min;
+    st->wSecond = gt.tm_sec;
+    st->wMilliseconds = 0;
+}
+
+
+/* Win32 FILETIME <-> SYSTEMTIME (Windows epoch = 1601-01-01, 100ns ticks) */
+#ifndef _WIN32_EPOCH_DELTA_SECONDS
+#define _WIN32_EPOCH_DELTA_SECONDS 11644473600ULL
+#endif
+
+static inline BOOL SystemTimeToFileTime(const SYSTEMTIME* st, FILETIME* ft) {
+    if (!st || !ft) return FALSE;
+    struct tm tm;
+    memset(&tm, 0, sizeof(tm));
+    tm.tm_year = (int)st->wYear - 1900;
+    tm.tm_mon  = (int)st->wMonth - 1;
+    tm.tm_mday = (int)st->wDay;
+    tm.tm_hour = (int)st->wHour;
+    tm.tm_min  = (int)st->wMinute;
+    tm.tm_sec  = (int)st->wSecond;
+    time_t t = timegm(&tm);
+    unsigned long long ticks =
+        ((unsigned long long)t + _WIN32_EPOCH_DELTA_SECONDS) * 10000000ULL
+        + (unsigned long long)st->wMilliseconds * 10000ULL;
+    ft->dwLowDateTime  = (DWORD)(ticks & 0xFFFFFFFFULL);
+    ft->dwHighDateTime = (DWORD)(ticks >> 32);
+    return TRUE;
+}
+
+static inline BOOL FileTimeToSystemTime(const FILETIME* ft, SYSTEMTIME* st) {
+    if (!ft || !st) return FALSE;
+    unsigned long long ticks =
+        ((unsigned long long)ft->dwHighDateTime << 32) | ft->dwLowDateTime;
+    unsigned long long secs = ticks / 10000000ULL;
+    unsigned long long ms   = (ticks % 10000000ULL) / 10000ULL;
+    time_t t = (time_t)(secs - _WIN32_EPOCH_DELTA_SECONDS);
+    struct tm gt;
+    gmtime_r(&t, &gt);
+    st->wYear         = (WORD)(gt.tm_year + 1900);
+    st->wMonth        = (WORD)(gt.tm_mon + 1);
+    st->wDayOfWeek    = (WORD)gt.tm_wday;
+    st->wDay          = (WORD)gt.tm_mday;
+    st->wHour         = (WORD)gt.tm_hour;
+    st->wMinute       = (WORD)gt.tm_min;
+    st->wSecond       = (WORD)gt.tm_sec;
+    st->wMilliseconds = (WORD)ms;
+    return TRUE;
+}
+
+
+/* Xbox 360 XDK memory intrinsics — map to standard C library */
+#ifndef XMemCpy
+static inline void* XMemCpy(void* dst, const void* src, size_t n) {
+    return memcpy(dst, src, n);
+}
+#endif
+#ifndef XMemSet
+static inline void* XMemSet(void* dst, int v, size_t n) {
+    return memset(dst, v, n);
+}
+#endif
+#ifndef XMemCmp
+static inline int XMemCmp(const void* a, const void* b, size_t n) {
+    return memcmp(a, b, n);
+}
+#endif
+#ifndef XMemMove
+static inline void* XMemMove(void* dst, const void* src, size_t n) {
+    return memmove(dst, src, n);
+}
+#endif
+
+
+/* ============================================================
+ * Win32 Thread-Local Storage (pthread-backed)
+ * ============================================================ */
+#ifndef TLS_OUT_OF_INDEXES
+#define TLS_OUT_OF_INDEXES ((DWORD)0xFFFFFFFF)
+#endif
+#ifndef TLS_MINIMUM_AVAILABLE
+#define TLS_MINIMUM_AVAILABLE 64
+#endif
+
+#define COMPAT_TLS_SLOTS 64
+static inline DWORD TlsAlloc(void) {
+    static __thread int _dummy;
+    (void)_dummy;
+    static volatile int _next = 0;
+    int id = __sync_fetch_and_add(&_next, 1);
+    if (id >= COMPAT_TLS_SLOTS) return TLS_OUT_OF_INDEXES;
+    return (DWORD)(id + 1);  /* 0 is reserved as invalid */
+}
+
+static inline BOOL TlsSetValue(DWORD idx, LPVOID val) {
+    if (idx == 0 || idx > COMPAT_TLS_SLOTS) return FALSE;
+    static __thread LPVOID _slots[COMPAT_TLS_SLOTS + 1];
+    _slots[idx] = val;
+    return TRUE;
+}
+
+static inline LPVOID TlsGetValue(DWORD idx) {
+    if (idx == 0 || idx > COMPAT_TLS_SLOTS) return NULL;
+    static __thread LPVOID _slots[COMPAT_TLS_SLOTS + 1];
+    return _slots[idx];
+}
+
+static inline BOOL TlsFree(DWORD idx) {
+    (void)idx;
+    return TRUE;
+}
+
+/* ============================================================
+ * PIX profiling markers — no-op on Android
+ * ============================================================ */
+#ifndef PIXBeginNamedEvent
+#define PIXBeginNamedEvent(...)  ((void)0)
+#endif
+#ifndef PIXEndNamedEvent
+#define PIXEndNamedEvent(...)    ((void)0)
+#endif
+#ifndef PIXBeginEvent
+#define PIXBeginEvent(...)       ((void)0)
+#endif
+#ifndef PIXEndEvent
+#define PIXEndEvent(...)         ((void)0)
+#endif
+
+/* ============================================================
+ * Xbox 360 LZX compression API stubs
+ * Real implementation deferred to a later phase (Phase 6).
+ * Signatures preserved; behaviour returns failure.
+ * ============================================================ */
+#ifndef XMEMCODEC_LZX
+#define XMEMCODEC_LZX 0x0001
+#endif
+
+typedef struct _XMEMCODEC_PARAMETERS_LZX {
+    unsigned int Flags;
+    unsigned int WindowSize;
+    unsigned int CompressionPartitionSize;
+} XMEMCODEC_PARAMETERS_LZX;
+
+typedef void* XMEMCOMPRESSION_CONTEXT;
+typedef void* XMEMDECOMPRESSION_CONTEXT;
+
+static inline int XMemCreateCompressionContext(unsigned int codec,
+                                              const XMEMCODEC_PARAMETERS_LZX* params,
+                                              unsigned int flags,
+                                              XMEMCOMPRESSION_CONTEXT* ctx) {
+    (void)codec; (void)params; (void)flags;
+    if (ctx) *ctx = NULL;
+    return 0;  /* failure — real impl TBD */
+}
+
+static inline int XMemCreateDecompressionContext(unsigned int codec,
+                                                const XMEMCODEC_PARAMETERS_LZX* params,
+                                                unsigned int flags,
+                                                XMEMDECOMPRESSION_CONTEXT* ctx) {
+    (void)codec; (void)params; (void)flags;
+    if (ctx) *ctx = NULL;
+    return 0;
+}
+
+static inline void XMemDestroyCompressionContext(XMEMCOMPRESSION_CONTEXT ctx) { (void)ctx; }
+static inline void XMemDestroyDecompressionContext(XMEMDECOMPRESSION_CONTEXT ctx) { (void)ctx; }
+
+static inline int XMemCompress(XMEMCOMPRESSION_CONTEXT ctx,
+                               void* dst, SIZE_T* dstSize,
+                               const void* src, SIZE_T srcSize) {
+    (void)ctx; (void)dst; (void)src; (void)srcSize;
+    if (dstSize) *dstSize = 0;
+    return 0;
+}
+static inline int XMemCompress(XMEMCOMPRESSION_CONTEXT ctx,
+                               void* dst, DWORD* dstSize,
+                               const void* src, DWORD srcSize) {
+    (void)ctx; (void)dst; (void)src; (void)srcSize;
+    if (dstSize) *dstSize = 0;
+    return 0;
+}
+
+static inline int XMemDecompress(XMEMDECOMPRESSION_CONTEXT ctx,
+                                 void* dst, SIZE_T* dstSize,
+                                 const void* src, SIZE_T srcSize) {
+    (void)ctx; (void)dst; (void)src; (void)srcSize;
+    if (dstSize) *dstSize = 0;
+    return 0;
+}
+static inline int XMemDecompress(XMEMDECOMPRESSION_CONTEXT ctx,
+                                 void* dst, DWORD* dstSize,
+                                 const void* src, DWORD srcSize) {
+    (void)ctx; (void)dst; (void)src; (void)srcSize;
+    if (dstSize) *dstSize = 0;
+    return 0;
+}
+
+
+/* Win32 fixed-width signed integers */
+#ifndef __int8
+typedef signed char         __int8;
+#endif
+#ifndef __int16
+typedef short               __int16;
+#endif
+#ifndef __int32
+typedef int                 __int32;
+#endif
+#ifndef __int64
+typedef long long           __int64;
+#endif
+
+/* Xbox 360 XDK lock-free stack — fallback stub.
+ * Real semantics matter only for concurrent tile storage;
+ * single-threaded fallback is sufficient for compilation and initial boot. */
+#ifdef __cplusplus
+template<typename T, int Alignment = 4>
+class XLockFreeStack {
+public:
+    XLockFreeStack() {}
+    ~XLockFreeStack() {}
+    void Push(T* /*item*/) {}
+    T*   Pop()    { return nullptr; }
+    T*   PopAll() { return nullptr; }
+    bool IsEmpty() const { return true; }
+    void Purge() {}
+};
+#endif
+
+
+/* Xbox LIVE XUID constants */
+#ifndef INVALID_XUID
+#define INVALID_XUID        ((PlayerUID)0ULL)
+#endif
+#ifndef XUSER_INDEX_ANY
+#define XUSER_INDEX_ANY     0x000000FF
+#endif
+/* Xbox 360 system XUID prefix (0xE000...) */
+#ifndef XUID_OFFLINE_PREFIX
+#define XUID_OFFLINE_PREFIX 0xE000000000000000ULL
+#endif
+#ifndef XUID_ONLINE_PREFIX
+#define XUID_ONLINE_PREFIX  0x0000000000000000ULL
+#endif
+
+/* PlayerUID is defined in Minecraft.World/stdafx.h.
+ * Ensure it is visible here before using it. */
+#ifndef COMPAT_PLAYERUID_DEFINED
+typedef unsigned long long PlayerUID;
+#define COMPAT_PLAYERUID_DEFINED 1
+#endif
+
+
+/* ============================================================
+ * Game string IDs (IDS_*) — fallback defaults.
+ * On real platforms these come from the XUI string table.
+ * On Android they will be replaced by the platform string table.
+ * Values are arbitrary unique integers; only uniqueness matters here.
+ * ============================================================ */
+#ifndef IDS_TILE_BED_NOT_VALID
+#define IDS_TILE_BED_NOT_VALID        7001
+#endif
+#ifndef IDS_GAME_MODE_CHANGED
+#define IDS_GAME_MODE_CHANGED         7002
+#endif
+#ifndef IDS_GAME_MODE_CHANGED_TO
+#define IDS_GAME_MODE_CHANGED_TO      7003
+#endif
+#ifndef IDS_DEFAULT_SAVENAME
+#define IDS_DEFAULT_SAVENAME          7004
+#endif
+#ifndef IDS_GAMENAME
+#define IDS_GAMENAME                  7005
+#endif
+#ifndef IDS_SAVECACHEFILE
+#define IDS_SAVECACHEFILE             7006
+#endif
+#ifndef IDS_OPTIONSFILE
+#define IDS_OPTIONSFILE               7007
+#endif
+
+
+/* ============================================================
+ * Network protocol version constants.
+ * Real value from Minecraft: Legacy Console Edition TU25 protocol.
+ * Used by PreLoginPacket and Connection for handshake.
+ * ============================================================ */
+#ifndef MINECRAFT_NET_VERSION
+#define MINECRAFT_NET_VERSION   0x0000004D  /* 77 — placeholder matching TU25 */
+#endif
+#ifndef MINECRAFT_NET_VERSION_MIN
+#define MINECRAFT_NET_VERSION_MIN  MINECRAFT_NET_VERSION
+#endif
+
+
+/* ============================================================
+ * Boost-style hash_value helpers (used by Minecraft.World/Hasher.cpp).
+ * On Android we provide generic overloads for common types.
+ * ============================================================ */
+#ifdef __cplusplus
+#include <functional>
+#include <string>
+#include <cstddef>
+
+namespace compat_hash {
+    template<typename T>
+    inline std::size_t hash_value(const T& v) {
+        return std::hash<T>()(v);
+    }
+
+    inline std::size_t hash_value(const std::string& s) {
+        return std::hash<std::string>()(s);
+    }
+
+    inline std::size_t hash_value(const std::wstring& s) {
+        return std::hash<std::wstring>()(s);
+    }
+
+    inline std::size_t hash_value(int v)                { return std::hash<int>()(v); }
+    inline std::size_t hash_value(unsigned int v)       { return std::hash<unsigned int>()(v); }
+    inline std::size_t hash_value(long v)               { return std::hash<long>()(v); }
+    inline std::size_t hash_value(unsigned long v)      { return std::hash<unsigned long>()(v); }
+    inline std::size_t hash_value(long long v)          { return std::hash<long long>()(v); }
+    inline std::size_t hash_value(unsigned long long v) { return std::hash<unsigned long long>()(v); }
+    inline std::size_t hash_value(float v)              { return std::hash<float>()(v); }
+    inline std::size_t hash_value(double v)             { return std::hash<double>()(v); }
+    inline std::size_t hash_value(const void* p)        { return std::hash<const void*>()(p); }
+}
+
+using compat_hash::hash_value;
+#endif /* __cplusplus */
+
+
+/* ============================================================
+ * Bulk IDS_* fallback definitions for Android port.
+ * Auto-generated from a full scan of Minecraft.World + Minecraft.Client.
+ * Replace with real string-table lookups in a later phase.
+ * ============================================================ */
+#ifndef IDS_DISPLAY_NAME
+#define IDS_DISPLAY_NAME 7100
+#endif
+#ifndef IDS_LABEL_P
+#define IDS_LABEL_P 7101
+#endif
+#ifndef IDS_PRO_CURRENTLY_NOT_ONLINE_TITLE
+#define IDS_PRO_CURRENTLY_NOT_ONLINE_TITLE 7102
+#endif
+#ifndef IDS_PRO_PSNOFFLINE_TEXT
+#define IDS_PRO_PSNOFFLINE_TEXT 7103
+#endif
+#ifndef IDS_SAVE_TRANSFER_TITLE
+#define IDS_SAVE_TRANSFER_TITLE 7104
+#endif
+#ifndef IDS_SAVE_TRANSFER_UPLOADING
+#define IDS_SAVE_TRANSFER_UPLOADING 7105
+#endif
+#ifndef IDS_TILE_WOOD
+#define IDS_TILE_WOOD 7106
+#endif
+#ifndef IDS_TOOLTIPS_UPLOAD_SAVE_FOR_XBOXONE
+#define IDS_TOOLTIPS_UPLOAD_SAVE_FOR_XBOXONE 7107
+#endif
+#ifndef IDS_TP_DESCRIPTION
+#define IDS_TP_DESCRIPTION 7108
+#endif
+#ifndef IDS_UPLOAD_SAVE
+#define IDS_UPLOAD_SAVE 7109
+#endif
+#ifndef IDS_XBONE_CANCEL_UPLOAD_TEXT
+#define IDS_XBONE_CANCEL_UPLOAD_TEXT 7110
+#endif
+#ifndef IDS_XBONE_CANCEL_UPLOAD_TITLE
+#define IDS_XBONE_CANCEL_UPLOAD_TITLE 7111
+#endif
+#ifndef IDS_XBONE_EMPTYSLOT
+#define IDS_XBONE_EMPTYSLOT 7112
+#endif
+#ifndef IDS_XBONE_SELECTSLOT
+#define IDS_XBONE_SELECTSLOT 7113
+#endif
+#ifndef IDS_XBONE_UPLOAD_METADATA
+#define IDS_XBONE_UPLOAD_METADATA 7114
+#endif
+#ifndef IDS_XBONE_UPLOAD_SAVE
+#define IDS_XBONE_UPLOAD_SAVE 7115
+#endif
+#ifndef IDS_XBONE_UPLOAD_SAVE_TITLE
+#define IDS_XBONE_UPLOAD_SAVE_TITLE 7116
+#endif
+
+
+/* ============================================================
+ * Bulk IDS_* — FORCE-ADD every symbol used in Minecraft.World.
+ * #ifndef guard makes it safe even if already defined elsewhere.
+ * ============================================================ */
+#ifndef IDS_BLAZE
+#define IDS_BLAZE 8000
+#endif
+#ifndef IDS_CANT_SPAWN_IN_PEACEFUL
+#define IDS_CANT_SPAWN_IN_PEACEFUL 8001
+#endif
+#ifndef IDS_CARROTS
+#define IDS_CARROTS 8002
+#endif
+#ifndef IDS_CAVE_SPIDER
+#define IDS_CAVE_SPIDER 8003
+#endif
+#ifndef IDS_CHEST_LARGE
+#define IDS_CHEST_LARGE 8004
+#endif
+#ifndef IDS_CHICKEN
+#define IDS_CHICKEN 8005
+#endif
+#ifndef IDS_COW
+#define IDS_COW 8006
+#endif
+#ifndef IDS_CREEPER
+#define IDS_CREEPER 8007
+#endif
+#ifndef IDS_DESC_ANVIL
+#define IDS_DESC_ANVIL 8008
+#endif
+#ifndef IDS_DESC_APPLE
+#define IDS_DESC_APPLE 8009
+#endif
+#ifndef IDS_DESC_ARROW
+#define IDS_DESC_ARROW 8010
+#endif
+#ifndef IDS_DESC_BED
+#define IDS_DESC_BED 8011
+#endif
+#ifndef IDS_DESC_BEDROCK
+#define IDS_DESC_BEDROCK 8012
+#endif
+#ifndef IDS_DESC_BEEF_COOKED
+#define IDS_DESC_BEEF_COOKED 8013
+#endif
+#ifndef IDS_DESC_BEEF_RAW
+#define IDS_DESC_BEEF_RAW 8014
+#endif
+#ifndef IDS_DESC_BLAZE_POWDER
+#define IDS_DESC_BLAZE_POWDER 8015
+#endif
+#ifndef IDS_DESC_BLAZE_ROD
+#define IDS_DESC_BLAZE_ROD 8016
+#endif
+#ifndef IDS_DESC_BLOCK_DIAMOND
+#define IDS_DESC_BLOCK_DIAMOND 8017
+#endif
+#ifndef IDS_DESC_BLOCK_GOLD
+#define IDS_DESC_BLOCK_GOLD 8018
+#endif
+#ifndef IDS_DESC_BLOCK_IRON
+#define IDS_DESC_BLOCK_IRON 8019
+#endif
+#ifndef IDS_DESC_BLOCK_LAPIS
+#define IDS_DESC_BLOCK_LAPIS 8020
+#endif
+#ifndef IDS_DESC_BOAT
+#define IDS_DESC_BOAT 8021
+#endif
+#ifndef IDS_DESC_BONE
+#define IDS_DESC_BONE 8022
+#endif
+#ifndef IDS_DESC_BOOK
+#define IDS_DESC_BOOK 8023
+#endif
+#ifndef IDS_DESC_BOOKSHELF
+#define IDS_DESC_BOOKSHELF 8024
+#endif
+#ifndef IDS_DESC_BOOTS_CHAIN
+#define IDS_DESC_BOOTS_CHAIN 8025
+#endif
+#ifndef IDS_DESC_BOOTS_DIAMOND
+#define IDS_DESC_BOOTS_DIAMOND 8026
+#endif
+#ifndef IDS_DESC_BOOTS_GOLD
+#define IDS_DESC_BOOTS_GOLD 8027
+#endif
+#ifndef IDS_DESC_BOOTS_IRON
+#define IDS_DESC_BOOTS_IRON 8028
+#endif
+#ifndef IDS_DESC_BOOTS_LEATHER
+#define IDS_DESC_BOOTS_LEATHER 8029
+#endif
+#ifndef IDS_DESC_BOW
+#define IDS_DESC_BOW 8030
+#endif
+#ifndef IDS_DESC_BOWL
+#define IDS_DESC_BOWL 8031
+#endif
+#ifndef IDS_DESC_BREAD
+#define IDS_DESC_BREAD 8032
+#endif
+#ifndef IDS_DESC_BREWING_STAND
+#define IDS_DESC_BREWING_STAND 8033
+#endif
+#ifndef IDS_DESC_BRICK
+#define IDS_DESC_BRICK 8034
+#endif
+#ifndef IDS_DESC_BUCKET
+#define IDS_DESC_BUCKET 8035
+#endif
+#ifndef IDS_DESC_BUCKET_LAVA
+#define IDS_DESC_BUCKET_LAVA 8036
+#endif
+#ifndef IDS_DESC_BUCKET_MILK
+#define IDS_DESC_BUCKET_MILK 8037
+#endif
+#ifndef IDS_DESC_BUCKET_WATER
+#define IDS_DESC_BUCKET_WATER 8038
+#endif
+#ifndef IDS_DESC_BUTTON
+#define IDS_DESC_BUTTON 8039
+#endif
+#ifndef IDS_DESC_CACTUS
+#define IDS_DESC_CACTUS 8040
+#endif
+#ifndef IDS_DESC_CAKE
+#define IDS_DESC_CAKE 8041
+#endif
+#ifndef IDS_DESC_CARPET
+#define IDS_DESC_CARPET 8042
+#endif
+#ifndef IDS_DESC_CARROTS
+#define IDS_DESC_CARROTS 8043
+#endif
+#ifndef IDS_DESC_CARROT_GOLDEN
+#define IDS_DESC_CARROT_GOLDEN 8044
+#endif
+#ifndef IDS_DESC_CARROT_ON_A_STICK
+#define IDS_DESC_CARROT_ON_A_STICK 8045
+#endif
+#ifndef IDS_DESC_CAULDRON
+#define IDS_DESC_CAULDRON 8046
+#endif
+#ifndef IDS_DESC_CHEST
+#define IDS_DESC_CHEST 8047
+#endif
+#ifndef IDS_DESC_CHESTPLATE_CHAIN
+#define IDS_DESC_CHESTPLATE_CHAIN 8048
+#endif
+#ifndef IDS_DESC_CHESTPLATE_DIAMOND
+#define IDS_DESC_CHESTPLATE_DIAMOND 8049
+#endif
+#ifndef IDS_DESC_CHESTPLATE_GOLD
+#define IDS_DESC_CHESTPLATE_GOLD 8050
+#endif
+#ifndef IDS_DESC_CHESTPLATE_IRON
+#define IDS_DESC_CHESTPLATE_IRON 8051
+#endif
+#ifndef IDS_DESC_CHESTPLATE_LEATHER
+#define IDS_DESC_CHESTPLATE_LEATHER 8052
+#endif
+#ifndef IDS_DESC_CHICKEN_COOKED
+#define IDS_DESC_CHICKEN_COOKED 8053
+#endif
+#ifndef IDS_DESC_CHICKEN_RAW
+#define IDS_DESC_CHICKEN_RAW 8054
+#endif
+#ifndef IDS_DESC_CLAY
+#define IDS_DESC_CLAY 8055
+#endif
+#ifndef IDS_DESC_CLAY_TILE
+#define IDS_DESC_CLAY_TILE 8056
+#endif
+#ifndef IDS_DESC_CLOCK
+#define IDS_DESC_CLOCK 8057
+#endif
+#ifndef IDS_DESC_COAL
+#define IDS_DESC_COAL 8058
+#endif
+#ifndef IDS_DESC_COBBLESTONE_WALL
+#define IDS_DESC_COBBLESTONE_WALL 8059
+#endif
+#ifndef IDS_DESC_COCOA
+#define IDS_DESC_COCOA 8060
+#endif
+#ifndef IDS_DESC_COMPASS
+#define IDS_DESC_COMPASS 8061
+#endif
+#ifndef IDS_DESC_COOKIE
+#define IDS_DESC_COOKIE 8062
+#endif
+#ifndef IDS_DESC_CRAFTINGTABLE
+#define IDS_DESC_CRAFTINGTABLE 8063
+#endif
+#ifndef IDS_DESC_CROPS
+#define IDS_DESC_CROPS 8064
+#endif
+#ifndef IDS_DESC_DEAD_BUSH
+#define IDS_DESC_DEAD_BUSH 8065
+#endif
+#ifndef IDS_DESC_DETECTORRAIL
+#define IDS_DESC_DETECTORRAIL 8066
+#endif
+#ifndef IDS_DESC_DIAMONDS
+#define IDS_DESC_DIAMONDS 8067
+#endif
+#ifndef IDS_DESC_DIRT
+#define IDS_DESC_DIRT 8068
+#endif
+#ifndef IDS_DESC_DISPENSER
+#define IDS_DESC_DISPENSER 8069
+#endif
+#ifndef IDS_DESC_DOOR_IRON
+#define IDS_DESC_DOOR_IRON 8070
+#endif
+#ifndef IDS_DESC_DOOR_WOOD
+#define IDS_DESC_DOOR_WOOD 8071
+#endif
+#ifndef IDS_DESC_DRAGONEGG
+#define IDS_DESC_DRAGONEGG 8072
+#endif
+#ifndef IDS_DESC_DYE_BLACK
+#define IDS_DESC_DYE_BLACK 8073
+#endif
+#ifndef IDS_DESC_DYE_BLUE
+#define IDS_DESC_DYE_BLUE 8074
+#endif
+#ifndef IDS_DESC_DYE_BROWN
+#define IDS_DESC_DYE_BROWN 8075
+#endif
+#ifndef IDS_DESC_DYE_CYAN
+#define IDS_DESC_DYE_CYAN 8076
+#endif
+#ifndef IDS_DESC_DYE_GRAY
+#define IDS_DESC_DYE_GRAY 8077
+#endif
+#ifndef IDS_DESC_DYE_GREEN
+#define IDS_DESC_DYE_GREEN 8078
+#endif
+#ifndef IDS_DESC_DYE_LIGHTBLUE
+#define IDS_DESC_DYE_LIGHTBLUE 8079
+#endif
+#ifndef IDS_DESC_DYE_LIGHTGRAY
+#define IDS_DESC_DYE_LIGHTGRAY 8080
+#endif
+#ifndef IDS_DESC_DYE_LIME
+#define IDS_DESC_DYE_LIME 8081
+#endif
+#ifndef IDS_DESC_DYE_MAGENTA
+#define IDS_DESC_DYE_MAGENTA 8082
+#endif
+#ifndef IDS_DESC_DYE_ORANGE
+#define IDS_DESC_DYE_ORANGE 8083
+#endif
+#ifndef IDS_DESC_DYE_PINK
+#define IDS_DESC_DYE_PINK 8084
+#endif
+#ifndef IDS_DESC_DYE_PURPLE
+#define IDS_DESC_DYE_PURPLE 8085
+#endif
+#ifndef IDS_DESC_DYE_RED
+#define IDS_DESC_DYE_RED 8086
+#endif
+#ifndef IDS_DESC_DYE_WHITE
+#define IDS_DESC_DYE_WHITE 8087
+#endif
+#ifndef IDS_DESC_DYE_YELLOW
+#define IDS_DESC_DYE_YELLOW 8088
+#endif
+#ifndef IDS_DESC_EGG
+#define IDS_DESC_EGG 8089
+#endif
+#ifndef IDS_DESC_EMERALD
+#define IDS_DESC_EMERALD 8090
+#endif
+#ifndef IDS_DESC_EMERALDBLOCK
+#define IDS_DESC_EMERALDBLOCK 8091
+#endif
+#ifndef IDS_DESC_EMERALDORE
+#define IDS_DESC_EMERALDORE 8092
+#endif
+#ifndef IDS_DESC_ENCHANTED_BOOK
+#define IDS_DESC_ENCHANTED_BOOK 8093
+#endif
+#ifndef IDS_DESC_ENCHANTED_GOLDENAPPLE
+#define IDS_DESC_ENCHANTED_GOLDENAPPLE 8094
+#endif
+#ifndef IDS_DESC_ENCHANTMENTTABLE
+#define IDS_DESC_ENCHANTMENTTABLE 8095
+#endif
+#ifndef IDS_DESC_ENDERCHEST
+#define IDS_DESC_ENDERCHEST 8096
+#endif
+#ifndef IDS_DESC_ENDER_PEARL
+#define IDS_DESC_ENDER_PEARL 8097
+#endif
+#ifndef IDS_DESC_ENDPORTALFRAME
+#define IDS_DESC_ENDPORTALFRAME 8098
+#endif
+#ifndef IDS_DESC_END_PORTAL
+#define IDS_DESC_END_PORTAL 8099
+#endif
+#ifndef IDS_DESC_EXP_BOTTLE
+#define IDS_DESC_EXP_BOTTLE 8100
+#endif
+#ifndef IDS_DESC_EYE_OF_ENDER
+#define IDS_DESC_EYE_OF_ENDER 8101
+#endif
+#ifndef IDS_DESC_FARMLAND
+#define IDS_DESC_FARMLAND 8102
+#endif
+#ifndef IDS_DESC_FEATHER
+#define IDS_DESC_FEATHER 8103
+#endif
+#ifndef IDS_DESC_FENCE
+#define IDS_DESC_FENCE 8104
+#endif
+#ifndef IDS_DESC_FENCE_GATE
+#define IDS_DESC_FENCE_GATE 8105
+#endif
+#ifndef IDS_DESC_FERMENTED_SPIDER_EYE
+#define IDS_DESC_FERMENTED_SPIDER_EYE 8106
+#endif
+#ifndef IDS_DESC_FIREBALL
+#define IDS_DESC_FIREBALL 8107
+#endif
+#ifndef IDS_DESC_FISHINGROD
+#define IDS_DESC_FISHINGROD 8108
+#endif
+#ifndef IDS_DESC_FISH_COOKED
+#define IDS_DESC_FISH_COOKED 8109
+#endif
+#ifndef IDS_DESC_FISH_RAW
+#define IDS_DESC_FISH_RAW 8110
+#endif
+#ifndef IDS_DESC_FLINT
+#define IDS_DESC_FLINT 8111
+#endif
+#ifndef IDS_DESC_FLINTANDSTEEL
+#define IDS_DESC_FLINTANDSTEEL 8112
+#endif
+#ifndef IDS_DESC_FLOWER
+#define IDS_DESC_FLOWER 8113
+#endif
+#ifndef IDS_DESC_FLOWERPOT
+#define IDS_DESC_FLOWERPOT 8114
+#endif
+#ifndef IDS_DESC_FURNACE
+#define IDS_DESC_FURNACE 8115
+#endif
+#ifndef IDS_DESC_GHAST_TEAR
+#define IDS_DESC_GHAST_TEAR 8116
+#endif
+#ifndef IDS_DESC_GLASS
+#define IDS_DESC_GLASS 8117
+#endif
+#ifndef IDS_DESC_GLASS_BOTTLE
+#define IDS_DESC_GLASS_BOTTLE 8118
+#endif
+#ifndef IDS_DESC_GLOWSTONE
+#define IDS_DESC_GLOWSTONE 8119
+#endif
+#ifndef IDS_DESC_GOLDENAPPLE
+#define IDS_DESC_GOLDENAPPLE 8120
+#endif
+#ifndef IDS_DESC_GOLD_NUGGET
+#define IDS_DESC_GOLD_NUGGET 8121
+#endif
+#ifndef IDS_DESC_GRASS
+#define IDS_DESC_GRASS 8122
+#endif
+#ifndef IDS_DESC_GRAVEL
+#define IDS_DESC_GRAVEL 8123
+#endif
+#ifndef IDS_DESC_HALFSLAB
+#define IDS_DESC_HALFSLAB 8124
+#endif
+#ifndef IDS_DESC_HATCHET
+#define IDS_DESC_HATCHET 8125
+#endif
+#ifndef IDS_DESC_HELL_ROCK
+#define IDS_DESC_HELL_ROCK 8126
+#endif
+#ifndef IDS_DESC_HELL_SAND
+#define IDS_DESC_HELL_SAND 8127
+#endif
+#ifndef IDS_DESC_HELMET_CHAIN
+#define IDS_DESC_HELMET_CHAIN 8128
+#endif
+#ifndef IDS_DESC_HELMET_DIAMOND
+#define IDS_DESC_HELMET_DIAMOND 8129
+#endif
+#ifndef IDS_DESC_HELMET_GOLD
+#define IDS_DESC_HELMET_GOLD 8130
+#endif
+#ifndef IDS_DESC_HELMET_IRON
+#define IDS_DESC_HELMET_IRON 8131
+#endif
+#ifndef IDS_DESC_HELMET_LEATHER
+#define IDS_DESC_HELMET_LEATHER 8132
+#endif
+#ifndef IDS_DESC_HOE
+#define IDS_DESC_HOE 8133
+#endif
+#ifndef IDS_DESC_ICE
+#define IDS_DESC_ICE 8134
+#endif
+#ifndef IDS_DESC_INGOT
+#define IDS_DESC_INGOT 8135
+#endif
+#ifndef IDS_DESC_IRON_FENCE
+#define IDS_DESC_IRON_FENCE 8136
+#endif
+#ifndef IDS_DESC_ITEMFRAME
+#define IDS_DESC_ITEMFRAME 8137
+#endif
+#ifndef IDS_DESC_ITEM_NETHERBRICK
+#define IDS_DESC_ITEM_NETHERBRICK 8138
+#endif
+#ifndef IDS_DESC_JACKOLANTERN
+#define IDS_DESC_JACKOLANTERN 8139
+#endif
+#ifndef IDS_DESC_JUKEBOX
+#define IDS_DESC_JUKEBOX 8140
+#endif
+#ifndef IDS_DESC_LADDER
+#define IDS_DESC_LADDER 8141
+#endif
+#ifndef IDS_DESC_LAVA
+#define IDS_DESC_LAVA 8142
+#endif
+#ifndef IDS_DESC_LEATHER
+#define IDS_DESC_LEATHER 8143
+#endif
+#ifndef IDS_DESC_LEAVES
+#define IDS_DESC_LEAVES 8144
+#endif
+#ifndef IDS_DESC_LEGGINGS_CHAIN
+#define IDS_DESC_LEGGINGS_CHAIN 8145
+#endif
+#ifndef IDS_DESC_LEGGINGS_DIAMOND
+#define IDS_DESC_LEGGINGS_DIAMOND 8146
+#endif
+#ifndef IDS_DESC_LEGGINGS_GOLD
+#define IDS_DESC_LEGGINGS_GOLD 8147
+#endif
+#ifndef IDS_DESC_LEGGINGS_IRON
+#define IDS_DESC_LEGGINGS_IRON 8148
+#endif
+#ifndef IDS_DESC_LEGGINGS_LEATHER
+#define IDS_DESC_LEGGINGS_LEATHER 8149
+#endif
+#ifndef IDS_DESC_LEVER
+#define IDS_DESC_LEVER 8150
+#endif
+#ifndef IDS_DESC_LOG
+#define IDS_DESC_LOG 8151
+#endif
+#ifndef IDS_DESC_MAGMA_CREAM
+#define IDS_DESC_MAGMA_CREAM 8152
+#endif
+#ifndef IDS_DESC_MAP
+#define IDS_DESC_MAP 8153
+#endif
+#ifndef IDS_DESC_MELON_BLOCK
+#define IDS_DESC_MELON_BLOCK 8154
+#endif
+#ifndef IDS_DESC_MELON_SEEDS
+#define IDS_DESC_MELON_SEEDS 8155
+#endif
+#ifndef IDS_DESC_MELON_SLICE
+#define IDS_DESC_MELON_SLICE 8156
+#endif
+#ifndef IDS_DESC_MINECART
+#define IDS_DESC_MINECART 8157
+#endif
+#ifndef IDS_DESC_MINECARTWITHCHEST
+#define IDS_DESC_MINECARTWITHCHEST 8158
+#endif
+#ifndef IDS_DESC_MINECARTWITHFURNACE
+#define IDS_DESC_MINECARTWITHFURNACE 8159
+#endif
+#ifndef IDS_DESC_MOB_SPAWNER
+#define IDS_DESC_MOB_SPAWNER 8160
+#endif
+#ifndef IDS_DESC_MONSTER_SPAWNER
+#define IDS_DESC_MONSTER_SPAWNER 8161
+#endif
+#ifndef IDS_DESC_MOSS_STONE
+#define IDS_DESC_MOSS_STONE 8162
+#endif
+#ifndef IDS_DESC_MUSHROOM
+#define IDS_DESC_MUSHROOM 8163
+#endif
+#ifndef IDS_DESC_MUSHROOMSTEW
+#define IDS_DESC_MUSHROOMSTEW 8164
+#endif
+#ifndef IDS_DESC_MYCEL
+#define IDS_DESC_MYCEL 8165
+#endif
+#ifndef IDS_DESC_NETHERBRICK
+#define IDS_DESC_NETHERBRICK 8166
+#endif
+#ifndef IDS_DESC_NETHERFENCE
+#define IDS_DESC_NETHERFENCE 8167
+#endif
+#ifndef IDS_DESC_NETHERSTALK
+#define IDS_DESC_NETHERSTALK 8168
+#endif
+#ifndef IDS_DESC_NETHER_QUARTZ
+#define IDS_DESC_NETHER_QUARTZ 8169
+#endif
+#ifndef IDS_DESC_NETHER_QUARTZ_ORE
+#define IDS_DESC_NETHER_QUARTZ_ORE 8170
+#endif
+#ifndef IDS_DESC_NETHER_STALK_SEEDS
+#define IDS_DESC_NETHER_STALK_SEEDS 8171
+#endif
+#ifndef IDS_DESC_NOTEBLOCK
+#define IDS_DESC_NOTEBLOCK 8172
+#endif
+#ifndef IDS_DESC_OBSIDIAN
+#define IDS_DESC_OBSIDIAN 8173
+#endif
+#ifndef IDS_DESC_ORE_COAL
+#define IDS_DESC_ORE_COAL 8174
+#endif
+#ifndef IDS_DESC_ORE_DIAMOND
+#define IDS_DESC_ORE_DIAMOND 8175
+#endif
+#ifndef IDS_DESC_ORE_GOLD
+#define IDS_DESC_ORE_GOLD 8176
+#endif
+#ifndef IDS_DESC_ORE_IRON
+#define IDS_DESC_ORE_IRON 8177
+#endif
+#ifndef IDS_DESC_ORE_LAPIS
+#define IDS_DESC_ORE_LAPIS 8178
+#endif
+#ifndef IDS_DESC_ORE_REDSTONE
+#define IDS_DESC_ORE_REDSTONE 8179
+#endif
+#ifndef IDS_DESC_PAPER
+#define IDS_DESC_PAPER 8180
+#endif
+#ifndef IDS_DESC_PICKAXE
+#define IDS_DESC_PICKAXE 8181
+#endif
+#ifndef IDS_DESC_PICTURE
+#define IDS_DESC_PICTURE 8182
+#endif
+#ifndef IDS_DESC_PISTON
+#define IDS_DESC_PISTON 8183
+#endif
+#ifndef IDS_DESC_PORKCHOP_COOKED
+#define IDS_DESC_PORKCHOP_COOKED 8184
+#endif
+#ifndef IDS_DESC_PORKCHOP_RAW
+#define IDS_DESC_PORKCHOP_RAW 8185
+#endif
+#ifndef IDS_DESC_PORTAL
+#define IDS_DESC_PORTAL 8186
+#endif
+#ifndef IDS_DESC_POTATO
+#define IDS_DESC_POTATO 8187
+#endif
+#ifndef IDS_DESC_POTATO_BAKED
+#define IDS_DESC_POTATO_BAKED 8188
+#endif
+#ifndef IDS_DESC_POTATO_POISONOUS
+#define IDS_DESC_POTATO_POISONOUS 8189
+#endif
+#ifndef IDS_DESC_POTION
+#define IDS_DESC_POTION 8190
+#endif
+#ifndef IDS_DESC_POWEREDRAIL
+#define IDS_DESC_POWEREDRAIL 8191
+#endif
+#ifndef IDS_DESC_PRESSUREPLATE
+#define IDS_DESC_PRESSUREPLATE 8192
+#endif
+#ifndef IDS_DESC_PUMPKIN
+#define IDS_DESC_PUMPKIN 8193
+#endif
+#ifndef IDS_DESC_PUMPKIN_PIE
+#define IDS_DESC_PUMPKIN_PIE 8194
+#endif
+#ifndef IDS_DESC_PUMPKIN_SEEDS
+#define IDS_DESC_PUMPKIN_SEEDS 8195
+#endif
+#ifndef IDS_DESC_QUARTZ_BLOCK
+#define IDS_DESC_QUARTZ_BLOCK 8196
+#endif
+#ifndef IDS_DESC_RAIL
+#define IDS_DESC_RAIL 8197
+#endif
+#ifndef IDS_DESC_RECORD
+#define IDS_DESC_RECORD 8198
+#endif
+#ifndef IDS_DESC_REDSTONEREPEATER
+#define IDS_DESC_REDSTONEREPEATER 8199
+#endif
+#ifndef IDS_DESC_REDSTONETORCH
+#define IDS_DESC_REDSTONETORCH 8200
+#endif
+#ifndef IDS_DESC_REDSTONE_DUST
+#define IDS_DESC_REDSTONE_DUST 8201
+#endif
+#ifndef IDS_DESC_REDSTONE_LIGHT
+#define IDS_DESC_REDSTONE_LIGHT 8202
+#endif
+#ifndef IDS_DESC_REEDS
+#define IDS_DESC_REEDS 8203
+#endif
+#ifndef IDS_DESC_ROTTEN_FLESH
+#define IDS_DESC_ROTTEN_FLESH 8204
+#endif
+#ifndef IDS_DESC_SADDLE
+#define IDS_DESC_SADDLE 8205
+#endif
+#ifndef IDS_DESC_SAND
+#define IDS_DESC_SAND 8206
+#endif
+#ifndef IDS_DESC_SANDSTONE
+#define IDS_DESC_SANDSTONE 8207
+#endif
+#ifndef IDS_DESC_SAPLING
+#define IDS_DESC_SAPLING 8208
+#endif
+#ifndef IDS_DESC_SHEARS
+#define IDS_DESC_SHEARS 8209
+#endif
+#ifndef IDS_DESC_SHOVEL
+#define IDS_DESC_SHOVEL 8210
+#endif
+#ifndef IDS_DESC_SIGN
+#define IDS_DESC_SIGN 8211
+#endif
+#ifndef IDS_DESC_SKULL
+#define IDS_DESC_SKULL 8212
+#endif
+#ifndef IDS_DESC_SLAB
+#define IDS_DESC_SLAB 8213
+#endif
+#ifndef IDS_DESC_SLIMEBALL
+#define IDS_DESC_SLIMEBALL 8214
+#endif
+#ifndef IDS_DESC_SNOW
+#define IDS_DESC_SNOW 8215
+#endif
+#ifndef IDS_DESC_SNOWBALL
+#define IDS_DESC_SNOWBALL 8216
+#endif
+#ifndef IDS_DESC_SPECKLED_MELON
+#define IDS_DESC_SPECKLED_MELON 8217
+#endif
+#ifndef IDS_DESC_SPIDER_EYE
+#define IDS_DESC_SPIDER_EYE 8218
+#endif
+#ifndef IDS_DESC_SPONGE
+#define IDS_DESC_SPONGE 8219
+#endif
+#ifndef IDS_DESC_STAIRS
+#define IDS_DESC_STAIRS 8220
+#endif
+#ifndef IDS_DESC_STICK
+#define IDS_DESC_STICK 8221
+#endif
+#ifndef IDS_DESC_STICKY_PISTON
+#define IDS_DESC_STICKY_PISTON 8222
+#endif
+#ifndef IDS_DESC_STONE
+#define IDS_DESC_STONE 8223
+#endif
+#ifndef IDS_DESC_STONESLAB
+#define IDS_DESC_STONESLAB 8224
+#endif
+#ifndef IDS_DESC_STONE_BRICK
+#define IDS_DESC_STONE_BRICK 8225
+#endif
+#ifndef IDS_DESC_STONE_BRICK_SMOOTH
+#define IDS_DESC_STONE_BRICK_SMOOTH 8226
+#endif
+#ifndef IDS_DESC_STONE_SILVERFISH
+#define IDS_DESC_STONE_SILVERFISH 8227
+#endif
+#ifndef IDS_DESC_STRING
+#define IDS_DESC_STRING 8228
+#endif
+#ifndef IDS_DESC_SUGAR
+#define IDS_DESC_SUGAR 8229
+#endif
+#ifndef IDS_DESC_SULPHUR
+#define IDS_DESC_SULPHUR 8230
+#endif
+#ifndef IDS_DESC_SWORD
+#define IDS_DESC_SWORD 8231
+#endif
+#ifndef IDS_DESC_TALL_GRASS
+#define IDS_DESC_TALL_GRASS 8232
+#endif
+#ifndef IDS_DESC_THIN_GLASS
+#define IDS_DESC_THIN_GLASS 8233
+#endif
+#ifndef IDS_DESC_TNT
+#define IDS_DESC_TNT 8234
+#endif
+#ifndef IDS_DESC_TOP_SNOW
+#define IDS_DESC_TOP_SNOW 8235
+#endif
+#ifndef IDS_DESC_TORCH
+#define IDS_DESC_TORCH 8236
+#endif
+#ifndef IDS_DESC_TRAPDOOR
+#define IDS_DESC_TRAPDOOR 8237
+#endif
+#ifndef IDS_DESC_TRIPWIRE
+#define IDS_DESC_TRIPWIRE 8238
+#endif
+#ifndef IDS_DESC_TRIPWIRE_SOURCE
+#define IDS_DESC_TRIPWIRE_SOURCE 8239
+#endif
+#ifndef IDS_DESC_VINE
+#define IDS_DESC_VINE 8240
+#endif
+#ifndef IDS_DESC_WATER
+#define IDS_DESC_WATER 8241
+#endif
+#ifndef IDS_DESC_WATERLILY
+#define IDS_DESC_WATERLILY 8242
+#endif
+#ifndef IDS_DESC_WEB
+#define IDS_DESC_WEB 8243
+#endif
+#ifndef IDS_DESC_WHEAT
+#define IDS_DESC_WHEAT 8244
+#endif
+#ifndef IDS_DESC_WHEAT_SEEDS
+#define IDS_DESC_WHEAT_SEEDS 8245
+#endif
+#ifndef IDS_DESC_WHITESTONE
+#define IDS_DESC_WHITESTONE 8246
+#endif
+#ifndef IDS_DESC_WOODENPLANKS
+#define IDS_DESC_WOODENPLANKS 8247
+#endif
+#ifndef IDS_DESC_WOODSLAB
+#define IDS_DESC_WOODSLAB 8248
+#endif
+#ifndef IDS_DESC_WOOL
+#define IDS_DESC_WOOL 8249
+#endif
+#ifndef IDS_DESC_YELLOW_DUST
+#define IDS_DESC_YELLOW_DUST 8250
+#endif
+#ifndef IDS_ENCHANT
+#define IDS_ENCHANT 8251
+#endif
+#ifndef IDS_ENCHANTMENT_ARROW_DAMAGE
+#define IDS_ENCHANTMENT_ARROW_DAMAGE 8252
+#endif
+#ifndef IDS_ENCHANTMENT_ARROW_FIRE
+#define IDS_ENCHANTMENT_ARROW_FIRE 8253
+#endif
+#ifndef IDS_ENCHANTMENT_ARROW_INFINITE
+#define IDS_ENCHANTMENT_ARROW_INFINITE 8254
+#endif
+#ifndef IDS_ENCHANTMENT_ARROW_KNOCKBACK
+#define IDS_ENCHANTMENT_ARROW_KNOCKBACK 8255
+#endif
+#ifndef IDS_ENCHANTMENT_DAMAGE_ALL
+#define IDS_ENCHANTMENT_DAMAGE_ALL 8256
+#endif
+#ifndef IDS_ENCHANTMENT_DAMAGE_ARTHROPODS
+#define IDS_ENCHANTMENT_DAMAGE_ARTHROPODS 8257
+#endif
+#ifndef IDS_ENCHANTMENT_DAMAGE_UNDEAD
+#define IDS_ENCHANTMENT_DAMAGE_UNDEAD 8258
+#endif
+#ifndef IDS_ENCHANTMENT_DIGGING
+#define IDS_ENCHANTMENT_DIGGING 8259
+#endif
+#ifndef IDS_ENCHANTMENT_DURABILITY
+#define IDS_ENCHANTMENT_DURABILITY 8260
+#endif
+#ifndef IDS_ENCHANTMENT_FIRE
+#define IDS_ENCHANTMENT_FIRE 8261
+#endif
+#ifndef IDS_ENCHANTMENT_KNOCKBACK
+#define IDS_ENCHANTMENT_KNOCKBACK 8262
+#endif
+#ifndef IDS_ENCHANTMENT_LEVEL_1
+#define IDS_ENCHANTMENT_LEVEL_1 8263
+#endif
+#ifndef IDS_ENCHANTMENT_LEVEL_10
+#define IDS_ENCHANTMENT_LEVEL_10 8264
+#endif
+#ifndef IDS_ENCHANTMENT_LEVEL_2
+#define IDS_ENCHANTMENT_LEVEL_2 8265
+#endif
+#ifndef IDS_ENCHANTMENT_LEVEL_3
+#define IDS_ENCHANTMENT_LEVEL_3 8266
+#endif
+#ifndef IDS_ENCHANTMENT_LEVEL_4
+#define IDS_ENCHANTMENT_LEVEL_4 8267
+#endif
+#ifndef IDS_ENCHANTMENT_LEVEL_5
+#define IDS_ENCHANTMENT_LEVEL_5 8268
+#endif
+#ifndef IDS_ENCHANTMENT_LEVEL_6
+#define IDS_ENCHANTMENT_LEVEL_6 8269
+#endif
+#ifndef IDS_ENCHANTMENT_LEVEL_7
+#define IDS_ENCHANTMENT_LEVEL_7 8270
+#endif
+#ifndef IDS_ENCHANTMENT_LEVEL_8
+#define IDS_ENCHANTMENT_LEVEL_8 8271
+#endif
+#ifndef IDS_ENCHANTMENT_LEVEL_9
+#define IDS_ENCHANTMENT_LEVEL_9 8272
+#endif
+#ifndef IDS_ENCHANTMENT_LOOT_BONUS
+#define IDS_ENCHANTMENT_LOOT_BONUS 8273
+#endif
+#ifndef IDS_ENCHANTMENT_LOOT_BONUS_DIGGER
+#define IDS_ENCHANTMENT_LOOT_BONUS_DIGGER 8274
+#endif
+#ifndef IDS_ENCHANTMENT_OXYGEN
+#define IDS_ENCHANTMENT_OXYGEN 8275
+#endif
+#ifndef IDS_ENCHANTMENT_PROTECT_ALL
+#define IDS_ENCHANTMENT_PROTECT_ALL 8276
+#endif
+#ifndef IDS_ENCHANTMENT_PROTECT_EXPLOSION
+#define IDS_ENCHANTMENT_PROTECT_EXPLOSION 8277
+#endif
+#ifndef IDS_ENCHANTMENT_PROTECT_FALL
+#define IDS_ENCHANTMENT_PROTECT_FALL 8278
+#endif
+#ifndef IDS_ENCHANTMENT_PROTECT_FIRE
+#define IDS_ENCHANTMENT_PROTECT_FIRE 8279
+#endif
+#ifndef IDS_ENCHANTMENT_PROTECT_PROJECTILE
+#define IDS_ENCHANTMENT_PROTECT_PROJECTILE 8280
+#endif
+#ifndef IDS_ENCHANTMENT_THORNS
+#define IDS_ENCHANTMENT_THORNS 8281
+#endif
+#ifndef IDS_ENCHANTMENT_UNTOUCHING
+#define IDS_ENCHANTMENT_UNTOUCHING 8282
+#endif
+#ifndef IDS_ENCHANTMENT_WATER_WORKER
+#define IDS_ENCHANTMENT_WATER_WORKER 8283
+#endif
+#ifndef IDS_ENDERMAN
+#define IDS_ENDERMAN 8284
+#endif
+#ifndef IDS_FLOWERPOT
+#define IDS_FLOWERPOT 8285
+#endif
+#ifndef IDS_GAME_MODE_CHANGED
+#define IDS_GAME_MODE_CHANGED 8286
+#endif
+#ifndef IDS_GHAST
+#define IDS_GHAST 8287
+#endif
+#ifndef IDS_INVENTORY
+#define IDS_INVENTORY 8288
+#endif
+#ifndef IDS_ITEM_APPLE
+#define IDS_ITEM_APPLE 8289
+#endif
+#ifndef IDS_ITEM_APPLE_GOLD
+#define IDS_ITEM_APPLE_GOLD 8290
+#endif
+#ifndef IDS_ITEM_ARROW
+#define IDS_ITEM_ARROW 8291
+#endif
+#ifndef IDS_ITEM_BED
+#define IDS_ITEM_BED 8292
+#endif
+#ifndef IDS_ITEM_BEEF_COOKED
+#define IDS_ITEM_BEEF_COOKED 8293
+#endif
+#ifndef IDS_ITEM_BEEF_RAW
+#define IDS_ITEM_BEEF_RAW 8294
+#endif
+#ifndef IDS_ITEM_BLAZE_POWDER
+#define IDS_ITEM_BLAZE_POWDER 8295
+#endif
+#ifndef IDS_ITEM_BLAZE_ROD
+#define IDS_ITEM_BLAZE_ROD 8296
+#endif
+#ifndef IDS_ITEM_BOAT
+#define IDS_ITEM_BOAT 8297
+#endif
+#ifndef IDS_ITEM_BONE
+#define IDS_ITEM_BONE 8298
+#endif
+#ifndef IDS_ITEM_BOOK
+#define IDS_ITEM_BOOK 8299
+#endif
+#ifndef IDS_ITEM_BOOTS_CHAIN
+#define IDS_ITEM_BOOTS_CHAIN 8300
+#endif
+#ifndef IDS_ITEM_BOOTS_CLOTH
+#define IDS_ITEM_BOOTS_CLOTH 8301
+#endif
+#ifndef IDS_ITEM_BOOTS_DIAMOND
+#define IDS_ITEM_BOOTS_DIAMOND 8302
+#endif
+#ifndef IDS_ITEM_BOOTS_GOLD
+#define IDS_ITEM_BOOTS_GOLD 8303
+#endif
+#ifndef IDS_ITEM_BOOTS_IRON
+#define IDS_ITEM_BOOTS_IRON 8304
+#endif
+#ifndef IDS_ITEM_BOW
+#define IDS_ITEM_BOW 8305
+#endif
+#ifndef IDS_ITEM_BOWL
+#define IDS_ITEM_BOWL 8306
+#endif
+#ifndef IDS_ITEM_BREAD
+#define IDS_ITEM_BREAD 8307
+#endif
+#ifndef IDS_ITEM_BREWING_STAND
+#define IDS_ITEM_BREWING_STAND 8308
+#endif
+#ifndef IDS_ITEM_BRICK
+#define IDS_ITEM_BRICK 8309
+#endif
+#ifndef IDS_ITEM_BUCKET
+#define IDS_ITEM_BUCKET 8310
+#endif
+#ifndef IDS_ITEM_BUCKET_LAVA
+#define IDS_ITEM_BUCKET_LAVA 8311
+#endif
+#ifndef IDS_ITEM_BUCKET_MILK
+#define IDS_ITEM_BUCKET_MILK 8312
+#endif
+#ifndef IDS_ITEM_BUCKET_WATER
+#define IDS_ITEM_BUCKET_WATER 8313
+#endif
+#ifndef IDS_ITEM_CAKE
+#define IDS_ITEM_CAKE 8314
+#endif
+#ifndef IDS_ITEM_CARROT_GOLDEN
+#define IDS_ITEM_CARROT_GOLDEN 8315
+#endif
+#ifndef IDS_ITEM_CARROT_ON_A_STICK
+#define IDS_ITEM_CARROT_ON_A_STICK 8316
+#endif
+#ifndef IDS_ITEM_CAULDRON
+#define IDS_ITEM_CAULDRON 8317
+#endif
+#ifndef IDS_ITEM_CHARCOAL
+#define IDS_ITEM_CHARCOAL 8318
+#endif
+#ifndef IDS_ITEM_CHESTPLATE_CHAIN
+#define IDS_ITEM_CHESTPLATE_CHAIN 8319
+#endif
+#ifndef IDS_ITEM_CHESTPLATE_CLOTH
+#define IDS_ITEM_CHESTPLATE_CLOTH 8320
+#endif
+#ifndef IDS_ITEM_CHESTPLATE_DIAMOND
+#define IDS_ITEM_CHESTPLATE_DIAMOND 8321
+#endif
+#ifndef IDS_ITEM_CHESTPLATE_GOLD
+#define IDS_ITEM_CHESTPLATE_GOLD 8322
+#endif
+#ifndef IDS_ITEM_CHESTPLATE_IRON
+#define IDS_ITEM_CHESTPLATE_IRON 8323
+#endif
+#ifndef IDS_ITEM_CHICKEN_COOKED
+#define IDS_ITEM_CHICKEN_COOKED 8324
+#endif
+#ifndef IDS_ITEM_CHICKEN_RAW
+#define IDS_ITEM_CHICKEN_RAW 8325
+#endif
+#ifndef IDS_ITEM_CLAY
+#define IDS_ITEM_CLAY 8326
+#endif
+#ifndef IDS_ITEM_CLOCK
+#define IDS_ITEM_CLOCK 8327
+#endif
+#ifndef IDS_ITEM_COAL
+#define IDS_ITEM_COAL 8328
+#endif
+#ifndef IDS_ITEM_COMPASS
+#define IDS_ITEM_COMPASS 8329
+#endif
+#ifndef IDS_ITEM_COOKIE
+#define IDS_ITEM_COOKIE 8330
+#endif
+#ifndef IDS_ITEM_DIAMOND
+#define IDS_ITEM_DIAMOND 8331
+#endif
+#ifndef IDS_ITEM_DIODE
+#define IDS_ITEM_DIODE 8332
+#endif
+#ifndef IDS_ITEM_DOOR_IRON
+#define IDS_ITEM_DOOR_IRON 8333
+#endif
+#ifndef IDS_ITEM_DOOR_WOOD
+#define IDS_ITEM_DOOR_WOOD 8334
+#endif
+#ifndef IDS_ITEM_DYE_POWDER
+#define IDS_ITEM_DYE_POWDER 8335
+#endif
+#ifndef IDS_ITEM_DYE_POWDER_BLACK
+#define IDS_ITEM_DYE_POWDER_BLACK 8336
+#endif
+#ifndef IDS_ITEM_DYE_POWDER_BLUE
+#define IDS_ITEM_DYE_POWDER_BLUE 8337
+#endif
+#ifndef IDS_ITEM_DYE_POWDER_BROWN
+#define IDS_ITEM_DYE_POWDER_BROWN 8338
+#endif
+#ifndef IDS_ITEM_DYE_POWDER_CYAN
+#define IDS_ITEM_DYE_POWDER_CYAN 8339
+#endif
+#ifndef IDS_ITEM_DYE_POWDER_GRAY
+#define IDS_ITEM_DYE_POWDER_GRAY 8340
+#endif
+#ifndef IDS_ITEM_DYE_POWDER_GREEN
+#define IDS_ITEM_DYE_POWDER_GREEN 8341
+#endif
+#ifndef IDS_ITEM_DYE_POWDER_LIGHT_BLUE
+#define IDS_ITEM_DYE_POWDER_LIGHT_BLUE 8342
+#endif
+#ifndef IDS_ITEM_DYE_POWDER_LIME
+#define IDS_ITEM_DYE_POWDER_LIME 8343
+#endif
+#ifndef IDS_ITEM_DYE_POWDER_MAGENTA
+#define IDS_ITEM_DYE_POWDER_MAGENTA 8344
+#endif
+#ifndef IDS_ITEM_DYE_POWDER_ORANGE
+#define IDS_ITEM_DYE_POWDER_ORANGE 8345
+#endif
+#ifndef IDS_ITEM_DYE_POWDER_PINK
+#define IDS_ITEM_DYE_POWDER_PINK 8346
+#endif
+#ifndef IDS_ITEM_DYE_POWDER_PURPLE
+#define IDS_ITEM_DYE_POWDER_PURPLE 8347
+#endif
+#ifndef IDS_ITEM_DYE_POWDER_RED
+#define IDS_ITEM_DYE_POWDER_RED 8348
+#endif
+#ifndef IDS_ITEM_DYE_POWDER_SILVER
+#define IDS_ITEM_DYE_POWDER_SILVER 8349
+#endif
+#ifndef IDS_ITEM_DYE_POWDER_WHITE
+#define IDS_ITEM_DYE_POWDER_WHITE 8350
+#endif
+#ifndef IDS_ITEM_DYE_POWDER_YELLOW
+#define IDS_ITEM_DYE_POWDER_YELLOW 8351
+#endif
+#ifndef IDS_ITEM_EGG
+#define IDS_ITEM_EGG 8352
+#endif
+#ifndef IDS_ITEM_EMERALD
+#define IDS_ITEM_EMERALD 8353
+#endif
+#ifndef IDS_ITEM_ENCHANTED_BOOK
+#define IDS_ITEM_ENCHANTED_BOOK 8354
+#endif
+#ifndef IDS_ITEM_ENDER_PEARL
+#define IDS_ITEM_ENDER_PEARL 8355
+#endif
+#ifndef IDS_ITEM_EXP_BOTTLE
+#define IDS_ITEM_EXP_BOTTLE 8356
+#endif
+#ifndef IDS_ITEM_EYE_OF_ENDER
+#define IDS_ITEM_EYE_OF_ENDER 8357
+#endif
+#ifndef IDS_ITEM_FEATHER
+#define IDS_ITEM_FEATHER 8358
+#endif
+#ifndef IDS_ITEM_FERMENTED_SPIDER_EYE
+#define IDS_ITEM_FERMENTED_SPIDER_EYE 8359
+#endif
+#ifndef IDS_ITEM_FIREBALL
+#define IDS_ITEM_FIREBALL 8360
+#endif
+#ifndef IDS_ITEM_FISHING_ROD
+#define IDS_ITEM_FISHING_ROD 8361
+#endif
+#ifndef IDS_ITEM_FISH_COOKED
+#define IDS_ITEM_FISH_COOKED 8362
+#endif
+#ifndef IDS_ITEM_FISH_RAW
+#define IDS_ITEM_FISH_RAW 8363
+#endif
+#ifndef IDS_ITEM_FLINT
+#define IDS_ITEM_FLINT 8364
+#endif
+#ifndef IDS_ITEM_FLINT_AND_STEEL
+#define IDS_ITEM_FLINT_AND_STEEL 8365
+#endif
+#ifndef IDS_ITEM_GHAST_TEAR
+#define IDS_ITEM_GHAST_TEAR 8366
+#endif
+#ifndef IDS_ITEM_GLASS_BOTTLE
+#define IDS_ITEM_GLASS_BOTTLE 8367
+#endif
+#ifndef IDS_ITEM_GOLD_NUGGET
+#define IDS_ITEM_GOLD_NUGGET 8368
+#endif
+#ifndef IDS_ITEM_HATCHET_DIAMOND
+#define IDS_ITEM_HATCHET_DIAMOND 8369
+#endif
+#ifndef IDS_ITEM_HATCHET_GOLD
+#define IDS_ITEM_HATCHET_GOLD 8370
+#endif
+#ifndef IDS_ITEM_HATCHET_IRON
+#define IDS_ITEM_HATCHET_IRON 8371
+#endif
+#ifndef IDS_ITEM_HATCHET_STONE
+#define IDS_ITEM_HATCHET_STONE 8372
+#endif
+#ifndef IDS_ITEM_HATCHET_WOOD
+#define IDS_ITEM_HATCHET_WOOD 8373
+#endif
+#ifndef IDS_ITEM_HELMET_CHAIN
+#define IDS_ITEM_HELMET_CHAIN 8374
+#endif
+#ifndef IDS_ITEM_HELMET_CLOTH
+#define IDS_ITEM_HELMET_CLOTH 8375
+#endif
+#ifndef IDS_ITEM_HELMET_DIAMOND
+#define IDS_ITEM_HELMET_DIAMOND 8376
+#endif
+#ifndef IDS_ITEM_HELMET_GOLD
+#define IDS_ITEM_HELMET_GOLD 8377
+#endif
+#ifndef IDS_ITEM_HELMET_IRON
+#define IDS_ITEM_HELMET_IRON 8378
+#endif
+#ifndef IDS_ITEM_HOE_DIAMOND
+#define IDS_ITEM_HOE_DIAMOND 8379
+#endif
+#ifndef IDS_ITEM_HOE_GOLD
+#define IDS_ITEM_HOE_GOLD 8380
+#endif
+#ifndef IDS_ITEM_HOE_IRON
+#define IDS_ITEM_HOE_IRON 8381
+#endif
+#ifndef IDS_ITEM_HOE_STONE
+#define IDS_ITEM_HOE_STONE 8382
+#endif
+#ifndef IDS_ITEM_HOE_WOOD
+#define IDS_ITEM_HOE_WOOD 8383
+#endif
+#ifndef IDS_ITEM_INGOT_GOLD
+#define IDS_ITEM_INGOT_GOLD 8384
+#endif
+#ifndef IDS_ITEM_INGOT_IRON
+#define IDS_ITEM_INGOT_IRON 8385
+#endif
+#ifndef IDS_ITEM_ITEMFRAME
+#define IDS_ITEM_ITEMFRAME 8386
+#endif
+#ifndef IDS_ITEM_LEATHER
+#define IDS_ITEM_LEATHER 8387
+#endif
+#ifndef IDS_ITEM_LEGGINGS_CHAIN
+#define IDS_ITEM_LEGGINGS_CHAIN 8388
+#endif
+#ifndef IDS_ITEM_LEGGINGS_CLOTH
+#define IDS_ITEM_LEGGINGS_CLOTH 8389
+#endif
+#ifndef IDS_ITEM_LEGGINGS_DIAMOND
+#define IDS_ITEM_LEGGINGS_DIAMOND 8390
+#endif
+#ifndef IDS_ITEM_LEGGINGS_GOLD
+#define IDS_ITEM_LEGGINGS_GOLD 8391
+#endif
+#ifndef IDS_ITEM_LEGGINGS_IRON
+#define IDS_ITEM_LEGGINGS_IRON 8392
+#endif
+#ifndef IDS_ITEM_MAGMA_CREAM
+#define IDS_ITEM_MAGMA_CREAM 8393
+#endif
+#ifndef IDS_ITEM_MAP
+#define IDS_ITEM_MAP 8394
+#endif
+#ifndef IDS_ITEM_MELON_SEEDS
+#define IDS_ITEM_MELON_SEEDS 8395
+#endif
+#ifndef IDS_ITEM_MELON_SLICE
+#define IDS_ITEM_MELON_SLICE 8396
+#endif
+#ifndef IDS_ITEM_MINECART
+#define IDS_ITEM_MINECART 8397
+#endif
+#ifndef IDS_ITEM_MINECART_CHEST
+#define IDS_ITEM_MINECART_CHEST 8398
+#endif
+#ifndef IDS_ITEM_MINECART_FURNACE
+#define IDS_ITEM_MINECART_FURNACE 8399
+#endif
+#ifndef IDS_ITEM_MONSTER_SPAWNER
+#define IDS_ITEM_MONSTER_SPAWNER 8400
+#endif
+#ifndef IDS_ITEM_MUSHROOM_STEW
+#define IDS_ITEM_MUSHROOM_STEW 8401
+#endif
+#ifndef IDS_ITEM_NETHERBRICK
+#define IDS_ITEM_NETHERBRICK 8402
+#endif
+#ifndef IDS_ITEM_NETHER_QUARTZ
+#define IDS_ITEM_NETHER_QUARTZ 8403
+#endif
+#ifndef IDS_ITEM_NETHER_STALK_SEEDS
+#define IDS_ITEM_NETHER_STALK_SEEDS 8404
+#endif
+#ifndef IDS_ITEM_PAINTING
+#define IDS_ITEM_PAINTING 8405
+#endif
+#ifndef IDS_ITEM_PAPER
+#define IDS_ITEM_PAPER 8406
+#endif
+#ifndef IDS_ITEM_PICKAXE_DIAMOND
+#define IDS_ITEM_PICKAXE_DIAMOND 8407
+#endif
+#ifndef IDS_ITEM_PICKAXE_GOLD
+#define IDS_ITEM_PICKAXE_GOLD 8408
+#endif
+#ifndef IDS_ITEM_PICKAXE_IRON
+#define IDS_ITEM_PICKAXE_IRON 8409
+#endif
+#ifndef IDS_ITEM_PICKAXE_STONE
+#define IDS_ITEM_PICKAXE_STONE 8410
+#endif
+#ifndef IDS_ITEM_PICKAXE_WOOD
+#define IDS_ITEM_PICKAXE_WOOD 8411
+#endif
+#ifndef IDS_ITEM_PORKCHOP_COOKED
+#define IDS_ITEM_PORKCHOP_COOKED 8412
+#endif
+#ifndef IDS_ITEM_PORKCHOP_RAW
+#define IDS_ITEM_PORKCHOP_RAW 8413
+#endif
+#ifndef IDS_ITEM_POTATO_BAKED
+#define IDS_ITEM_POTATO_BAKED 8414
+#endif
+#ifndef IDS_ITEM_POTATO_POISONOUS
+#define IDS_ITEM_POTATO_POISONOUS 8415
+#endif
+#ifndef IDS_ITEM_POTION
+#define IDS_ITEM_POTION 8416
+#endif
+#ifndef IDS_ITEM_PUMPKIN_PIE
+#define IDS_ITEM_PUMPKIN_PIE 8417
+#endif
+#ifndef IDS_ITEM_PUMPKIN_SEEDS
+#define IDS_ITEM_PUMPKIN_SEEDS 8418
+#endif
+#ifndef IDS_ITEM_RECORD_01
+#define IDS_ITEM_RECORD_01 8419
+#endif
+#ifndef IDS_ITEM_RECORD_02
+#define IDS_ITEM_RECORD_02 8420
+#endif
+#ifndef IDS_ITEM_RECORD_03
+#define IDS_ITEM_RECORD_03 8421
+#endif
+#ifndef IDS_ITEM_RECORD_04
+#define IDS_ITEM_RECORD_04 8422
+#endif
+#ifndef IDS_ITEM_RECORD_05
+#define IDS_ITEM_RECORD_05 8423
+#endif
+#ifndef IDS_ITEM_RECORD_06
+#define IDS_ITEM_RECORD_06 8424
+#endif
+#ifndef IDS_ITEM_RECORD_07
+#define IDS_ITEM_RECORD_07 8425
+#endif
+#ifndef IDS_ITEM_RECORD_08
+#define IDS_ITEM_RECORD_08 8426
+#endif
+#ifndef IDS_ITEM_RECORD_09
+#define IDS_ITEM_RECORD_09 8427
+#endif
+#ifndef IDS_ITEM_RECORD_10
+#define IDS_ITEM_RECORD_10 8428
+#endif
+#ifndef IDS_ITEM_RECORD_11
+#define IDS_ITEM_RECORD_11 8429
+#endif
+#ifndef IDS_ITEM_RECORD_12
+#define IDS_ITEM_RECORD_12 8430
+#endif
+#ifndef IDS_ITEM_REDSTONE
+#define IDS_ITEM_REDSTONE 8431
+#endif
+#ifndef IDS_ITEM_REEDS
+#define IDS_ITEM_REEDS 8432
+#endif
+#ifndef IDS_ITEM_ROTTEN_FLESH
+#define IDS_ITEM_ROTTEN_FLESH 8433
+#endif
+#ifndef IDS_ITEM_SADDLE
+#define IDS_ITEM_SADDLE 8434
+#endif
+#ifndef IDS_ITEM_SHEARS
+#define IDS_ITEM_SHEARS 8435
+#endif
+#ifndef IDS_ITEM_SHOVEL_DIAMOND
+#define IDS_ITEM_SHOVEL_DIAMOND 8436
+#endif
+#ifndef IDS_ITEM_SHOVEL_GOLD
+#define IDS_ITEM_SHOVEL_GOLD 8437
+#endif
+#ifndef IDS_ITEM_SHOVEL_IRON
+#define IDS_ITEM_SHOVEL_IRON 8438
+#endif
+#ifndef IDS_ITEM_SHOVEL_STONE
+#define IDS_ITEM_SHOVEL_STONE 8439
+#endif
+#ifndef IDS_ITEM_SHOVEL_WOOD
+#define IDS_ITEM_SHOVEL_WOOD 8440
+#endif
+#ifndef IDS_ITEM_SIGN
+#define IDS_ITEM_SIGN 8441
+#endif
+#ifndef IDS_ITEM_SKULL
+#define IDS_ITEM_SKULL 8442
+#endif
+#ifndef IDS_ITEM_SKULL_CHARACTER
+#define IDS_ITEM_SKULL_CHARACTER 8443
+#endif
+#ifndef IDS_ITEM_SKULL_CREEPER
+#define IDS_ITEM_SKULL_CREEPER 8444
+#endif
+#ifndef IDS_ITEM_SKULL_SKELETON
+#define IDS_ITEM_SKULL_SKELETON 8445
+#endif
+#ifndef IDS_ITEM_SKULL_WITHER
+#define IDS_ITEM_SKULL_WITHER 8446
+#endif
+#ifndef IDS_ITEM_SKULL_ZOMBIE
+#define IDS_ITEM_SKULL_ZOMBIE 8447
+#endif
+#ifndef IDS_ITEM_SLIMEBALL
+#define IDS_ITEM_SLIMEBALL 8448
+#endif
+#ifndef IDS_ITEM_SNOWBALL
+#define IDS_ITEM_SNOWBALL 8449
+#endif
+#ifndef IDS_ITEM_SPECKLED_MELON
+#define IDS_ITEM_SPECKLED_MELON 8450
+#endif
+#ifndef IDS_ITEM_SPIDER_EYE
+#define IDS_ITEM_SPIDER_EYE 8451
+#endif
+#ifndef IDS_ITEM_STICK
+#define IDS_ITEM_STICK 8452
+#endif
+#ifndef IDS_ITEM_STRING
+#define IDS_ITEM_STRING 8453
+#endif
+#ifndef IDS_ITEM_SUGAR
+#define IDS_ITEM_SUGAR 8454
+#endif
+#ifndef IDS_ITEM_SULPHUR
+#define IDS_ITEM_SULPHUR 8455
+#endif
+#ifndef IDS_ITEM_SWORD_DIAMOND
+#define IDS_ITEM_SWORD_DIAMOND 8456
+#endif
+#ifndef IDS_ITEM_SWORD_GOLD
+#define IDS_ITEM_SWORD_GOLD 8457
+#endif
+#ifndef IDS_ITEM_SWORD_IRON
+#define IDS_ITEM_SWORD_IRON 8458
+#endif
+#ifndef IDS_ITEM_SWORD_STONE
+#define IDS_ITEM_SWORD_STONE 8459
+#endif
+#ifndef IDS_ITEM_SWORD_WOOD
+#define IDS_ITEM_SWORD_WOOD 8460
+#endif
+#ifndef IDS_ITEM_WATER_BOTTLE
+#define IDS_ITEM_WATER_BOTTLE 8461
+#endif
+#ifndef IDS_ITEM_WHEAT
+#define IDS_ITEM_WHEAT 8462
+#endif
+#ifndef IDS_ITEM_WHEAT_SEEDS
+#define IDS_ITEM_WHEAT_SEEDS 8463
+#endif
+#ifndef IDS_ITEM_YELLOW_DUST
+#define IDS_ITEM_YELLOW_DUST 8464
+#endif
+#ifndef IDS_LAVA_SLIME
+#define IDS_LAVA_SLIME 8465
+#endif
+#ifndef IDS_MAX_BOATS
+#define IDS_MAX_BOATS 8466
+#endif
+#ifndef IDS_MAX_CHICKENS_BRED
+#define IDS_MAX_CHICKENS_BRED 8467
+#endif
+#ifndef IDS_MAX_CHICKENS_SPAWNED
+#define IDS_MAX_CHICKENS_SPAWNED 8468
+#endif
+#ifndef IDS_MAX_ENEMIES_SPAWNED
+#define IDS_MAX_ENEMIES_SPAWNED 8469
+#endif
+#ifndef IDS_MAX_HANGINGENTITIES
+#define IDS_MAX_HANGINGENTITIES 8470
+#endif
+#ifndef IDS_MAX_MOOSHROOMS_SPAWNED
+#define IDS_MAX_MOOSHROOMS_SPAWNED 8471
+#endif
+#ifndef IDS_MAX_MUSHROOMCOWS_BRED
+#define IDS_MAX_MUSHROOMCOWS_BRED 8472
+#endif
+#ifndef IDS_MAX_PIGS_SHEEP_COWS_CATS_BRED
+#define IDS_MAX_PIGS_SHEEP_COWS_CATS_BRED 8473
+#endif
+#ifndef IDS_MAX_PIGS_SHEEP_COWS_CATS_SPAWNED
+#define IDS_MAX_PIGS_SHEEP_COWS_CATS_SPAWNED 8474
+#endif
+#ifndef IDS_MAX_SQUID_SPAWNED
+#define IDS_MAX_SQUID_SPAWNED 8475
+#endif
+#ifndef IDS_MAX_VILLAGERS_SPAWNED
+#define IDS_MAX_VILLAGERS_SPAWNED 8476
+#endif
+#ifndef IDS_MAX_WOLVES_BRED
+#define IDS_MAX_WOLVES_BRED 8477
+#endif
+#ifndef IDS_MAX_WOLVES_SPAWNED
+#define IDS_MAX_WOLVES_SPAWNED 8478
+#endif
+#ifndef IDS_MUSHROOM_COW
+#define IDS_MUSHROOM_COW 8479
+#endif
+#ifndef IDS_OZELOT
+#define IDS_OZELOT 8480
+#endif
+#ifndef IDS_PIG
+#define IDS_PIG 8481
+#endif
+#ifndef IDS_PIGZOMBIE
+#define IDS_PIGZOMBIE 8482
+#endif
+#ifndef IDS_POTATO
+#define IDS_POTATO 8483
+#endif
+#ifndef IDS_POTION_BLINDNESS
+#define IDS_POTION_BLINDNESS 8484
+#endif
+#ifndef IDS_POTION_BLINDNESS_POSTFIX
+#define IDS_POTION_BLINDNESS_POSTFIX 8485
+#endif
+#ifndef IDS_POTION_CONFUSION
+#define IDS_POTION_CONFUSION 8486
+#endif
+#ifndef IDS_POTION_CONFUSION_POSTFIX
+#define IDS_POTION_CONFUSION_POSTFIX 8487
+#endif
+#ifndef IDS_POTION_DAMAGEBOOST
+#define IDS_POTION_DAMAGEBOOST 8488
+#endif
+#ifndef IDS_POTION_DAMAGEBOOST_POSTFIX
+#define IDS_POTION_DAMAGEBOOST_POSTFIX 8489
+#endif
+#ifndef IDS_POTION_DESC_DAMAGEBOOST
+#define IDS_POTION_DESC_DAMAGEBOOST 8490
+#endif
+#ifndef IDS_POTION_DESC_EMPTY
+#define IDS_POTION_DESC_EMPTY 8491
+#endif
+#ifndef IDS_POTION_DESC_FIRERESISTANCE
+#define IDS_POTION_DESC_FIRERESISTANCE 8492
+#endif
+#ifndef IDS_POTION_DESC_HARM
+#define IDS_POTION_DESC_HARM 8493
+#endif
+#ifndef IDS_POTION_DESC_HEAL
+#define IDS_POTION_DESC_HEAL 8494
+#endif
+#ifndef IDS_POTION_DESC_INVISIBILITY
+#define IDS_POTION_DESC_INVISIBILITY 8495
+#endif
+#ifndef IDS_POTION_DESC_MOVESLOWDOWN
+#define IDS_POTION_DESC_MOVESLOWDOWN 8496
+#endif
+#ifndef IDS_POTION_DESC_MOVESPEED
+#define IDS_POTION_DESC_MOVESPEED 8497
+#endif
+#ifndef IDS_POTION_DESC_NIGHTVISION
+#define IDS_POTION_DESC_NIGHTVISION 8498
+#endif
+#ifndef IDS_POTION_DESC_POISON
+#define IDS_POTION_DESC_POISON 8499
+#endif
+#ifndef IDS_POTION_DESC_REGENERATION
+#define IDS_POTION_DESC_REGENERATION 8500
+#endif
+#ifndef IDS_POTION_DESC_WATER_BOTTLE
+#define IDS_POTION_DESC_WATER_BOTTLE 8501
+#endif
+#ifndef IDS_POTION_DESC_WEAKNESS
+#define IDS_POTION_DESC_WEAKNESS 8502
+#endif
+#ifndef IDS_POTION_DIGSLOWDOWN
+#define IDS_POTION_DIGSLOWDOWN 8503
+#endif
+#ifndef IDS_POTION_DIGSLOWDOWN_POSTFIX
+#define IDS_POTION_DIGSLOWDOWN_POSTFIX 8504
+#endif
+#ifndef IDS_POTION_DIGSPEED
+#define IDS_POTION_DIGSPEED 8505
+#endif
+#ifndef IDS_POTION_DIGSPEED_POSTFIX
+#define IDS_POTION_DIGSPEED_POSTFIX 8506
+#endif
+#ifndef IDS_POTION_EMPTY
+#define IDS_POTION_EMPTY 8507
+#endif
+#ifndef IDS_POTION_FIRERESISTANCE
+#define IDS_POTION_FIRERESISTANCE 8508
+#endif
+#ifndef IDS_POTION_FIRERESISTANCE_POSTFIX
+#define IDS_POTION_FIRERESISTANCE_POSTFIX 8509
+#endif
+#ifndef IDS_POTION_HARM
+#define IDS_POTION_HARM 8510
+#endif
+#ifndef IDS_POTION_HARM_POSTFIX
+#define IDS_POTION_HARM_POSTFIX 8511
+#endif
+#ifndef IDS_POTION_HEAL
+#define IDS_POTION_HEAL 8512
+#endif
+#ifndef IDS_POTION_HEAL_POSTFIX
+#define IDS_POTION_HEAL_POSTFIX 8513
+#endif
+#ifndef IDS_POTION_HUNGER
+#define IDS_POTION_HUNGER 8514
+#endif
+#ifndef IDS_POTION_HUNGER_POSTFIX
+#define IDS_POTION_HUNGER_POSTFIX 8515
+#endif
+#ifndef IDS_POTION_INVISIBILITY
+#define IDS_POTION_INVISIBILITY 8516
+#endif
+#ifndef IDS_POTION_INVISIBILITY_POSTFIX
+#define IDS_POTION_INVISIBILITY_POSTFIX 8517
+#endif
+#ifndef IDS_POTION_JUMP
+#define IDS_POTION_JUMP 8518
+#endif
+#ifndef IDS_POTION_JUMP_POSTFIX
+#define IDS_POTION_JUMP_POSTFIX 8519
+#endif
+#ifndef IDS_POTION_MOVESLOWDOWN
+#define IDS_POTION_MOVESLOWDOWN 8520
+#endif
+#ifndef IDS_POTION_MOVESLOWDOWN_POSTFIX
+#define IDS_POTION_MOVESLOWDOWN_POSTFIX 8521
+#endif
+#ifndef IDS_POTION_MOVESPEED
+#define IDS_POTION_MOVESPEED 8522
+#endif
+#ifndef IDS_POTION_MOVESPEED_POSTFIX
+#define IDS_POTION_MOVESPEED_POSTFIX 8523
+#endif
+#ifndef IDS_POTION_NIGHTVISION
+#define IDS_POTION_NIGHTVISION 8524
+#endif
+#ifndef IDS_POTION_NIGHTVISION_POSTFIX
+#define IDS_POTION_NIGHTVISION_POSTFIX 8525
+#endif
+#ifndef IDS_POTION_POISON
+#define IDS_POTION_POISON 8526
+#endif
+#ifndef IDS_POTION_POISON_POSTFIX
+#define IDS_POTION_POISON_POSTFIX 8527
+#endif
+#ifndef IDS_POTION_POTENCY_0
+#define IDS_POTION_POTENCY_0 8528
+#endif
+#ifndef IDS_POTION_POTENCY_1
+#define IDS_POTION_POTENCY_1 8529
+#endif
+#ifndef IDS_POTION_POTENCY_2
+#define IDS_POTION_POTENCY_2 8530
+#endif
+#ifndef IDS_POTION_POTENCY_3
+#define IDS_POTION_POTENCY_3 8531
+#endif
+#ifndef IDS_POTION_PREFIX_ACRID
+#define IDS_POTION_PREFIX_ACRID 8532
+#endif
+#ifndef IDS_POTION_PREFIX_ARTLESS
+#define IDS_POTION_PREFIX_ARTLESS 8533
+#endif
+#ifndef IDS_POTION_PREFIX_AWKWARD
+#define IDS_POTION_PREFIX_AWKWARD 8534
+#endif
+#ifndef IDS_POTION_PREFIX_BLAND
+#define IDS_POTION_PREFIX_BLAND 8535
+#endif
+#ifndef IDS_POTION_PREFIX_BULKY
+#define IDS_POTION_PREFIX_BULKY 8536
+#endif
+#ifndef IDS_POTION_PREFIX_BUNGLING
+#define IDS_POTION_PREFIX_BUNGLING 8537
+#endif
+#ifndef IDS_POTION_PREFIX_BUTTERED
+#define IDS_POTION_PREFIX_BUTTERED 8538
+#endif
+#ifndef IDS_POTION_PREFIX_CHARMING
+#define IDS_POTION_PREFIX_CHARMING 8539
+#endif
+#ifndef IDS_POTION_PREFIX_CLEAR
+#define IDS_POTION_PREFIX_CLEAR 8540
+#endif
+#ifndef IDS_POTION_PREFIX_CORDIAL
+#define IDS_POTION_PREFIX_CORDIAL 8541
+#endif
+#ifndef IDS_POTION_PREFIX_DASHING
+#define IDS_POTION_PREFIX_DASHING 8542
+#endif
+#ifndef IDS_POTION_PREFIX_DEBONAIR
+#define IDS_POTION_PREFIX_DEBONAIR 8543
+#endif
+#ifndef IDS_POTION_PREFIX_DIFFUSE
+#define IDS_POTION_PREFIX_DIFFUSE 8544
+#endif
+#ifndef IDS_POTION_PREFIX_ELEGANT
+#define IDS_POTION_PREFIX_ELEGANT 8545
+#endif
+#ifndef IDS_POTION_PREFIX_FANCY
+#define IDS_POTION_PREFIX_FANCY 8546
+#endif
+#ifndef IDS_POTION_PREFIX_FLAT
+#define IDS_POTION_PREFIX_FLAT 8547
+#endif
+#ifndef IDS_POTION_PREFIX_FOUL
+#define IDS_POTION_PREFIX_FOUL 8548
+#endif
+#ifndef IDS_POTION_PREFIX_GRENADE
+#define IDS_POTION_PREFIX_GRENADE 8549
+#endif
+#ifndef IDS_POTION_PREFIX_GROSS
+#define IDS_POTION_PREFIX_GROSS 8550
+#endif
+#ifndef IDS_POTION_PREFIX_HARSH
+#define IDS_POTION_PREFIX_HARSH 8551
+#endif
+#ifndef IDS_POTION_PREFIX_MILKY
+#define IDS_POTION_PREFIX_MILKY 8552
+#endif
+#ifndef IDS_POTION_PREFIX_MUNDANE
+#define IDS_POTION_PREFIX_MUNDANE 8553
+#endif
+#ifndef IDS_POTION_PREFIX_ODORLESS
+#define IDS_POTION_PREFIX_ODORLESS 8554
+#endif
+#ifndef IDS_POTION_PREFIX_POTENT
+#define IDS_POTION_PREFIX_POTENT 8555
+#endif
+#ifndef IDS_POTION_PREFIX_RANK
+#define IDS_POTION_PREFIX_RANK 8556
+#endif
+#ifndef IDS_POTION_PREFIX_REFINED
+#define IDS_POTION_PREFIX_REFINED 8557
+#endif
+#ifndef IDS_POTION_PREFIX_SMOOTH
+#define IDS_POTION_PREFIX_SMOOTH 8558
+#endif
+#ifndef IDS_POTION_PREFIX_SPARKLING
+#define IDS_POTION_PREFIX_SPARKLING 8559
+#endif
+#ifndef IDS_POTION_PREFIX_STINKY
+#define IDS_POTION_PREFIX_STINKY 8560
+#endif
+#ifndef IDS_POTION_PREFIX_SUAVE
+#define IDS_POTION_PREFIX_SUAVE 8561
+#endif
+#ifndef IDS_POTION_PREFIX_THICK
+#define IDS_POTION_PREFIX_THICK 8562
+#endif
+#ifndef IDS_POTION_PREFIX_THIN
+#define IDS_POTION_PREFIX_THIN 8563
+#endif
+#ifndef IDS_POTION_PREFIX_UNINTERESTING
+#define IDS_POTION_PREFIX_UNINTERESTING 8564
+#endif
+#ifndef IDS_POTION_REGENERATION
+#define IDS_POTION_REGENERATION 8565
+#endif
+#ifndef IDS_POTION_REGENERATION_POSTFIX
+#define IDS_POTION_REGENERATION_POSTFIX 8566
+#endif
+#ifndef IDS_POTION_RESISTANCE
+#define IDS_POTION_RESISTANCE 8567
+#endif
+#ifndef IDS_POTION_RESISTANCE_POSTFIX
+#define IDS_POTION_RESISTANCE_POSTFIX 8568
+#endif
+#ifndef IDS_POTION_WATERBREATHING
+#define IDS_POTION_WATERBREATHING 8569
+#endif
+#ifndef IDS_POTION_WATERBREATHING_POSTFIX
+#define IDS_POTION_WATERBREATHING_POSTFIX 8570
+#endif
+#ifndef IDS_POTION_WEAKNESS
+#define IDS_POTION_WEAKNESS 8571
+#endif
+#ifndef IDS_POTION_WEAKNESS_POSTFIX
+#define IDS_POTION_WEAKNESS_POSTFIX 8572
+#endif
+#ifndef IDS_PROGRESS_NEW_WORLD_SEED
+#define IDS_PROGRESS_NEW_WORLD_SEED 8573
+#endif
+#ifndef IDS_REPAIR_AND_NAME
+#define IDS_REPAIR_AND_NAME 8574
+#endif
+#ifndef IDS_SHEEP
+#define IDS_SHEEP 8575
+#endif
+#ifndef IDS_SILVERFISH
+#define IDS_SILVERFISH 8576
+#endif
+#ifndef IDS_SKELETON
+#define IDS_SKELETON 8577
+#endif
+#ifndef IDS_SLIME
+#define IDS_SLIME 8578
+#endif
+#ifndef IDS_SPIDER
+#define IDS_SPIDER 8579
+#endif
+#ifndef IDS_SQUID
+#define IDS_SQUID 8580
+#endif
+#ifndef IDS_TILE_ANVIL
+#define IDS_TILE_ANVIL 8581
+#endif
+#ifndef IDS_TILE_ANVIL_INTACT
+#define IDS_TILE_ANVIL_INTACT 8582
+#endif
+#ifndef IDS_TILE_ANVIL_SLIGHTLYDAMAGED
+#define IDS_TILE_ANVIL_SLIGHTLYDAMAGED 8583
+#endif
+#ifndef IDS_TILE_ANVIL_VERYDAMAGED
+#define IDS_TILE_ANVIL_VERYDAMAGED 8584
+#endif
+#ifndef IDS_TILE_BED
+#define IDS_TILE_BED 8585
+#endif
+#ifndef IDS_TILE_BEDROCK
+#define IDS_TILE_BEDROCK 8586
+#endif
+#ifndef IDS_TILE_BED_NOTSAFE
+#define IDS_TILE_BED_NOTSAFE 8587
+#endif
+#ifndef IDS_TILE_BED_NOT_VALID
+#define IDS_TILE_BED_NOT_VALID 8588
+#endif
+#ifndef IDS_TILE_BED_NO_SLEEP
+#define IDS_TILE_BED_NO_SLEEP 8589
+#endif
+#ifndef IDS_TILE_BED_OCCUPIED
+#define IDS_TILE_BED_OCCUPIED 8590
+#endif
+#ifndef IDS_TILE_BED_PLAYERSLEEP
+#define IDS_TILE_BED_PLAYERSLEEP 8591
+#endif
+#ifndef IDS_TILE_BIRCHWOOD_PLANKS
+#define IDS_TILE_BIRCHWOOD_PLANKS 8592
+#endif
+#ifndef IDS_TILE_BLOCK_DIAMOND
+#define IDS_TILE_BLOCK_DIAMOND 8593
+#endif
+#ifndef IDS_TILE_BLOCK_GOLD
+#define IDS_TILE_BLOCK_GOLD 8594
+#endif
+#ifndef IDS_TILE_BLOCK_IRON
+#define IDS_TILE_BLOCK_IRON 8595
+#endif
+#ifndef IDS_TILE_BLOCK_LAPIS
+#define IDS_TILE_BLOCK_LAPIS 8596
+#endif
+#ifndef IDS_TILE_BOOKSHELF
+#define IDS_TILE_BOOKSHELF 8597
+#endif
+#ifndef IDS_TILE_BREWINGSTAND
+#define IDS_TILE_BREWINGSTAND 8598
+#endif
+#ifndef IDS_TILE_BRICK
+#define IDS_TILE_BRICK 8599
+#endif
+#ifndef IDS_TILE_BUTTON
+#define IDS_TILE_BUTTON 8600
+#endif
+#ifndef IDS_TILE_CACTUS
+#define IDS_TILE_CACTUS 8601
+#endif
+#ifndef IDS_TILE_CAKE
+#define IDS_TILE_CAKE 8602
+#endif
+#ifndef IDS_TILE_CARPET
+#define IDS_TILE_CARPET 8603
+#endif
+#ifndef IDS_TILE_CARPET_BLACK
+#define IDS_TILE_CARPET_BLACK 8604
+#endif
+#ifndef IDS_TILE_CARPET_BLUE
+#define IDS_TILE_CARPET_BLUE 8605
+#endif
+#ifndef IDS_TILE_CARPET_BROWN
+#define IDS_TILE_CARPET_BROWN 8606
+#endif
+#ifndef IDS_TILE_CARPET_CYAN
+#define IDS_TILE_CARPET_CYAN 8607
+#endif
+#ifndef IDS_TILE_CARPET_GRAY
+#define IDS_TILE_CARPET_GRAY 8608
+#endif
+#ifndef IDS_TILE_CARPET_GREEN
+#define IDS_TILE_CARPET_GREEN 8609
+#endif
+#ifndef IDS_TILE_CARPET_LIGHT_BLUE
+#define IDS_TILE_CARPET_LIGHT_BLUE 8610
+#endif
+#ifndef IDS_TILE_CARPET_LIME
+#define IDS_TILE_CARPET_LIME 8611
+#endif
+#ifndef IDS_TILE_CARPET_MAGENTA
+#define IDS_TILE_CARPET_MAGENTA 8612
+#endif
+#ifndef IDS_TILE_CARPET_ORANGE
+#define IDS_TILE_CARPET_ORANGE 8613
+#endif
+#ifndef IDS_TILE_CARPET_PINK
+#define IDS_TILE_CARPET_PINK 8614
+#endif
+#ifndef IDS_TILE_CARPET_PURPLE
+#define IDS_TILE_CARPET_PURPLE 8615
+#endif
+#ifndef IDS_TILE_CARPET_RED
+#define IDS_TILE_CARPET_RED 8616
+#endif
+#ifndef IDS_TILE_CARPET_SILVER
+#define IDS_TILE_CARPET_SILVER 8617
+#endif
+#ifndef IDS_TILE_CARPET_WHITE
+#define IDS_TILE_CARPET_WHITE 8618
+#endif
+#ifndef IDS_TILE_CARPET_YELLOW
+#define IDS_TILE_CARPET_YELLOW 8619
+#endif
+#ifndef IDS_TILE_CARROTS
+#define IDS_TILE_CARROTS 8620
+#endif
+#ifndef IDS_TILE_CAULDRON
+#define IDS_TILE_CAULDRON 8621
+#endif
+#ifndef IDS_TILE_CHEST
+#define IDS_TILE_CHEST 8622
+#endif
+#ifndef IDS_TILE_CLAY
+#define IDS_TILE_CLAY 8623
+#endif
+#ifndef IDS_TILE_CLOTH
+#define IDS_TILE_CLOTH 8624
+#endif
+#ifndef IDS_TILE_CLOTH_BLACK
+#define IDS_TILE_CLOTH_BLACK 8625
+#endif
+#ifndef IDS_TILE_CLOTH_BLUE
+#define IDS_TILE_CLOTH_BLUE 8626
+#endif
+#ifndef IDS_TILE_CLOTH_BROWN
+#define IDS_TILE_CLOTH_BROWN 8627
+#endif
+#ifndef IDS_TILE_CLOTH_CYAN
+#define IDS_TILE_CLOTH_CYAN 8628
+#endif
+#ifndef IDS_TILE_CLOTH_GRAY
+#define IDS_TILE_CLOTH_GRAY 8629
+#endif
+#ifndef IDS_TILE_CLOTH_GREEN
+#define IDS_TILE_CLOTH_GREEN 8630
+#endif
+#ifndef IDS_TILE_CLOTH_LIGHT_BLUE
+#define IDS_TILE_CLOTH_LIGHT_BLUE 8631
+#endif
+#ifndef IDS_TILE_CLOTH_LIME
+#define IDS_TILE_CLOTH_LIME 8632
+#endif
+#ifndef IDS_TILE_CLOTH_MAGENTA
+#define IDS_TILE_CLOTH_MAGENTA 8633
+#endif
+#ifndef IDS_TILE_CLOTH_ORANGE
+#define IDS_TILE_CLOTH_ORANGE 8634
+#endif
+#ifndef IDS_TILE_CLOTH_PINK
+#define IDS_TILE_CLOTH_PINK 8635
+#endif
+#ifndef IDS_TILE_CLOTH_PURPLE
+#define IDS_TILE_CLOTH_PURPLE 8636
+#endif
+#ifndef IDS_TILE_CLOTH_RED
+#define IDS_TILE_CLOTH_RED 8637
+#endif
+#ifndef IDS_TILE_CLOTH_SILVER
+#define IDS_TILE_CLOTH_SILVER 8638
+#endif
+#ifndef IDS_TILE_CLOTH_WHITE
+#define IDS_TILE_CLOTH_WHITE 8639
+#endif
+#ifndef IDS_TILE_CLOTH_YELLOW
+#define IDS_TILE_CLOTH_YELLOW 8640
+#endif
+#ifndef IDS_TILE_COBBLESTONE_WALL
+#define IDS_TILE_COBBLESTONE_WALL 8641
+#endif
+#ifndef IDS_TILE_COBBLESTONE_WALL_MOSSY
+#define IDS_TILE_COBBLESTONE_WALL_MOSSY 8642
+#endif
+#ifndef IDS_TILE_COCOA
+#define IDS_TILE_COCOA 8643
+#endif
+#ifndef IDS_TILE_CROPS
+#define IDS_TILE_CROPS 8644
+#endif
+#ifndef IDS_TILE_DEAD_BUSH
+#define IDS_TILE_DEAD_BUSH 8645
+#endif
+#ifndef IDS_TILE_DETECTOR_RAIL
+#define IDS_TILE_DETECTOR_RAIL 8646
+#endif
+#ifndef IDS_TILE_DIODE
+#define IDS_TILE_DIODE 8647
+#endif
+#ifndef IDS_TILE_DIRT
+#define IDS_TILE_DIRT 8648
+#endif
+#ifndef IDS_TILE_DISPENSER
+#define IDS_TILE_DISPENSER 8649
+#endif
+#ifndef IDS_TILE_DOOR_IRON
+#define IDS_TILE_DOOR_IRON 8650
+#endif
+#ifndef IDS_TILE_DOOR_WOOD
+#define IDS_TILE_DOOR_WOOD 8651
+#endif
+#ifndef IDS_TILE_DRAGONEGG
+#define IDS_TILE_DRAGONEGG 8652
+#endif
+#ifndef IDS_TILE_EMERALDBLOCK
+#define IDS_TILE_EMERALDBLOCK 8653
+#endif
+#ifndef IDS_TILE_EMERALDORE
+#define IDS_TILE_EMERALDORE 8654
+#endif
+#ifndef IDS_TILE_ENCHANTMENTTABLE
+#define IDS_TILE_ENCHANTMENTTABLE 8655
+#endif
+#ifndef IDS_TILE_ENDERCHEST
+#define IDS_TILE_ENDERCHEST 8656
+#endif
+#ifndef IDS_TILE_ENDPORTALFRAME
+#define IDS_TILE_ENDPORTALFRAME 8657
+#endif
+#ifndef IDS_TILE_END_PORTAL
+#define IDS_TILE_END_PORTAL 8658
+#endif
+#ifndef IDS_TILE_FARMLAND
+#define IDS_TILE_FARMLAND 8659
+#endif
+#ifndef IDS_TILE_FENCE
+#define IDS_TILE_FENCE 8660
+#endif
+#ifndef IDS_TILE_FENCE_GATE
+#define IDS_TILE_FENCE_GATE 8661
+#endif
+#ifndef IDS_TILE_FERN
+#define IDS_TILE_FERN 8662
+#endif
+#ifndef IDS_TILE_FIRE
+#define IDS_TILE_FIRE 8663
+#endif
+#ifndef IDS_TILE_FLOWER
+#define IDS_TILE_FLOWER 8664
+#endif
+#ifndef IDS_TILE_FLOWERPOT
+#define IDS_TILE_FLOWERPOT 8665
+#endif
+#ifndef IDS_TILE_FURNACE
+#define IDS_TILE_FURNACE 8666
+#endif
+#ifndef IDS_TILE_GLASS
+#define IDS_TILE_GLASS 8667
+#endif
+#ifndef IDS_TILE_GOLDEN_RAIL
+#define IDS_TILE_GOLDEN_RAIL 8668
+#endif
+#ifndef IDS_TILE_GRASS
+#define IDS_TILE_GRASS 8669
+#endif
+#ifndef IDS_TILE_GRAVEL
+#define IDS_TILE_GRAVEL 8670
+#endif
+#ifndef IDS_TILE_HELL_ROCK
+#define IDS_TILE_HELL_ROCK 8671
+#endif
+#ifndef IDS_TILE_HELL_SAND
+#define IDS_TILE_HELL_SAND 8672
+#endif
+#ifndef IDS_TILE_HUGE_MUSHROOM_1
+#define IDS_TILE_HUGE_MUSHROOM_1 8673
+#endif
+#ifndef IDS_TILE_HUGE_MUSHROOM_2
+#define IDS_TILE_HUGE_MUSHROOM_2 8674
+#endif
+#ifndef IDS_TILE_ICE
+#define IDS_TILE_ICE 8675
+#endif
+#ifndef IDS_TILE_IRON_FENCE
+#define IDS_TILE_IRON_FENCE 8676
+#endif
+#ifndef IDS_TILE_JUKEBOX
+#define IDS_TILE_JUKEBOX 8677
+#endif
+#ifndef IDS_TILE_JUNGLE_PLANKS
+#define IDS_TILE_JUNGLE_PLANKS 8678
+#endif
+#ifndef IDS_TILE_LADDER
+#define IDS_TILE_LADDER 8679
+#endif
+#ifndef IDS_TILE_LAVA
+#define IDS_TILE_LAVA 8680
+#endif
+#ifndef IDS_TILE_LEAVES
+#define IDS_TILE_LEAVES 8681
+#endif
+#ifndef IDS_TILE_LEAVES_BIRCH
+#define IDS_TILE_LEAVES_BIRCH 8682
+#endif
+#ifndef IDS_TILE_LEAVES_JUNGLE
+#define IDS_TILE_LEAVES_JUNGLE 8683
+#endif
+#ifndef IDS_TILE_LEAVES_OAK
+#define IDS_TILE_LEAVES_OAK 8684
+#endif
+#ifndef IDS_TILE_LEAVES_SPRUCE
+#define IDS_TILE_LEAVES_SPRUCE 8685
+#endif
+#ifndef IDS_TILE_LEVER
+#define IDS_TILE_LEVER 8686
+#endif
+#ifndef IDS_TILE_LIGHT_GEM
+#define IDS_TILE_LIGHT_GEM 8687
+#endif
+#ifndef IDS_TILE_LIT_PUMPKIN
+#define IDS_TILE_LIT_PUMPKIN 8688
+#endif
+#ifndef IDS_TILE_LOCKED_CHEST
+#define IDS_TILE_LOCKED_CHEST 8689
+#endif
+#ifndef IDS_TILE_LOG
+#define IDS_TILE_LOG 8690
+#endif
+#ifndef IDS_TILE_LOG_BIRCH
+#define IDS_TILE_LOG_BIRCH 8691
+#endif
+#ifndef IDS_TILE_LOG_JUNGLE
+#define IDS_TILE_LOG_JUNGLE 8692
+#endif
+#ifndef IDS_TILE_LOG_OAK
+#define IDS_TILE_LOG_OAK 8693
+#endif
+#ifndef IDS_TILE_LOG_SPRUCE
+#define IDS_TILE_LOG_SPRUCE 8694
+#endif
+#ifndef IDS_TILE_MELON
+#define IDS_TILE_MELON 8695
+#endif
+#ifndef IDS_TILE_MELON_STEM
+#define IDS_TILE_MELON_STEM 8696
+#endif
+#ifndef IDS_TILE_MOB_SPAWNER
+#define IDS_TILE_MOB_SPAWNER 8697
+#endif
+#ifndef IDS_TILE_MUSHROOM
+#define IDS_TILE_MUSHROOM 8698
+#endif
+#ifndef IDS_TILE_MUSIC_BLOCK
+#define IDS_TILE_MUSIC_BLOCK 8699
+#endif
+#ifndef IDS_TILE_MYCEL
+#define IDS_TILE_MYCEL 8700
+#endif
+#ifndef IDS_TILE_NETHERBRICK
+#define IDS_TILE_NETHERBRICK 8701
+#endif
+#ifndef IDS_TILE_NETHERFENCE
+#define IDS_TILE_NETHERFENCE 8702
+#endif
+#ifndef IDS_TILE_NETHERSTALK
+#define IDS_TILE_NETHERSTALK 8703
+#endif
+#ifndef IDS_TILE_NETHER_QUARTZ
+#define IDS_TILE_NETHER_QUARTZ 8704
+#endif
+#ifndef IDS_TILE_NOT_GATE
+#define IDS_TILE_NOT_GATE 8705
+#endif
+#ifndef IDS_TILE_OAKWOOD_PLANKS
+#define IDS_TILE_OAKWOOD_PLANKS 8706
+#endif
+#ifndef IDS_TILE_OBSIDIAN
+#define IDS_TILE_OBSIDIAN 8707
+#endif
+#ifndef IDS_TILE_ORE_COAL
+#define IDS_TILE_ORE_COAL 8708
+#endif
+#ifndef IDS_TILE_ORE_DIAMOND
+#define IDS_TILE_ORE_DIAMOND 8709
+#endif
+#ifndef IDS_TILE_ORE_GOLD
+#define IDS_TILE_ORE_GOLD 8710
+#endif
+#ifndef IDS_TILE_ORE_IRON
+#define IDS_TILE_ORE_IRON 8711
+#endif
+#ifndef IDS_TILE_ORE_LAPIS
+#define IDS_TILE_ORE_LAPIS 8712
+#endif
+#ifndef IDS_TILE_ORE_REDSTONE
+#define IDS_TILE_ORE_REDSTONE 8713
+#endif
+#ifndef IDS_TILE_PISTON_BASE
+#define IDS_TILE_PISTON_BASE 8714
+#endif
+#ifndef IDS_TILE_PISTON_STICK_BASE
+#define IDS_TILE_PISTON_STICK_BASE 8715
+#endif
+#ifndef IDS_TILE_PORTAL
+#define IDS_TILE_PORTAL 8716
+#endif
+#ifndef IDS_TILE_POTATOES
+#define IDS_TILE_POTATOES 8717
+#endif
+#ifndef IDS_TILE_PRESSURE_PLATE
+#define IDS_TILE_PRESSURE_PLATE 8718
+#endif
+#ifndef IDS_TILE_PUMPKIN
+#define IDS_TILE_PUMPKIN 8719
+#endif
+#ifndef IDS_TILE_PUMPKIN_STEM
+#define IDS_TILE_PUMPKIN_STEM 8720
+#endif
+#ifndef IDS_TILE_QUARTZ_BLOCK
+#define IDS_TILE_QUARTZ_BLOCK 8721
+#endif
+#ifndef IDS_TILE_QUARTZ_BLOCK_CHISELED
+#define IDS_TILE_QUARTZ_BLOCK_CHISELED 8722
+#endif
+#ifndef IDS_TILE_QUARTZ_BLOCK_LINES
+#define IDS_TILE_QUARTZ_BLOCK_LINES 8723
+#endif
+#ifndef IDS_TILE_RAIL
+#define IDS_TILE_RAIL 8724
+#endif
+#ifndef IDS_TILE_REDSTONE_DUST
+#define IDS_TILE_REDSTONE_DUST 8725
+#endif
+#ifndef IDS_TILE_REDSTONE_LIGHT
+#define IDS_TILE_REDSTONE_LIGHT 8726
+#endif
+#ifndef IDS_TILE_REEDS
+#define IDS_TILE_REEDS 8727
+#endif
+#ifndef IDS_TILE_ROSE
+#define IDS_TILE_ROSE 8728
+#endif
+#ifndef IDS_TILE_SAND
+#define IDS_TILE_SAND 8729
+#endif
+#ifndef IDS_TILE_SANDSTONE
+#define IDS_TILE_SANDSTONE 8730
+#endif
+#ifndef IDS_TILE_SANDSTONE_CHISELED
+#define IDS_TILE_SANDSTONE_CHISELED 8731
+#endif
+#ifndef IDS_TILE_SANDSTONE_SMOOTH
+#define IDS_TILE_SANDSTONE_SMOOTH 8732
+#endif
+#ifndef IDS_TILE_SAPLING
+#define IDS_TILE_SAPLING 8733
+#endif
+#ifndef IDS_TILE_SAPLING_BIRCH
+#define IDS_TILE_SAPLING_BIRCH 8734
+#endif
+#ifndef IDS_TILE_SAPLING_JUNGLE
+#define IDS_TILE_SAPLING_JUNGLE 8735
+#endif
+#ifndef IDS_TILE_SAPLING_OAK
+#define IDS_TILE_SAPLING_OAK 8736
+#endif
+#ifndef IDS_TILE_SAPLING_SPRUCE
+#define IDS_TILE_SAPLING_SPRUCE 8737
+#endif
+#ifndef IDS_TILE_SHRUB
+#define IDS_TILE_SHRUB 8738
+#endif
+#ifndef IDS_TILE_SIGN
+#define IDS_TILE_SIGN 8739
+#endif
+#ifndef IDS_TILE_SKULL
+#define IDS_TILE_SKULL 8740
+#endif
+#ifndef IDS_TILE_SNOW
+#define IDS_TILE_SNOW 8741
+#endif
+#ifndef IDS_TILE_SPONGE
+#define IDS_TILE_SPONGE 8742
+#endif
+#ifndef IDS_TILE_SPRUCEWOOD_PLANKS
+#define IDS_TILE_SPRUCEWOOD_PLANKS 8743
+#endif
+#ifndef IDS_TILE_STAIRS_BIRCHWOOD
+#define IDS_TILE_STAIRS_BIRCHWOOD 8744
+#endif
+#ifndef IDS_TILE_STAIRS_BRICKS
+#define IDS_TILE_STAIRS_BRICKS 8745
+#endif
+#ifndef IDS_TILE_STAIRS_JUNGLEWOOD
+#define IDS_TILE_STAIRS_JUNGLEWOOD 8746
+#endif
+#ifndef IDS_TILE_STAIRS_NETHERBRICK
+#define IDS_TILE_STAIRS_NETHERBRICK 8747
+#endif
+#ifndef IDS_TILE_STAIRS_QUARTZ
+#define IDS_TILE_STAIRS_QUARTZ 8748
+#endif
+#ifndef IDS_TILE_STAIRS_SANDSTONE
+#define IDS_TILE_STAIRS_SANDSTONE 8749
+#endif
+#ifndef IDS_TILE_STAIRS_SPRUCEWOOD
+#define IDS_TILE_STAIRS_SPRUCEWOOD 8750
+#endif
+#ifndef IDS_TILE_STAIRS_STONE
+#define IDS_TILE_STAIRS_STONE 8751
+#endif
+#ifndef IDS_TILE_STAIRS_STONE_BRICKS_SMOOTH
+#define IDS_TILE_STAIRS_STONE_BRICKS_SMOOTH 8752
+#endif
+#ifndef IDS_TILE_STAIRS_WOOD
+#define IDS_TILE_STAIRS_WOOD 8753
+#endif
+#ifndef IDS_TILE_STONE
+#define IDS_TILE_STONE 8754
+#endif
+#ifndef IDS_TILE_STONESLAB
+#define IDS_TILE_STONESLAB 8755
+#endif
+#ifndef IDS_TILE_STONESLAB_BIRCH
+#define IDS_TILE_STONESLAB_BIRCH 8756
+#endif
+#ifndef IDS_TILE_STONESLAB_BRICK
+#define IDS_TILE_STONESLAB_BRICK 8757
+#endif
+#ifndef IDS_TILE_STONESLAB_COBBLE
+#define IDS_TILE_STONESLAB_COBBLE 8758
+#endif
+#ifndef IDS_TILE_STONESLAB_JUNGLE
+#define IDS_TILE_STONESLAB_JUNGLE 8759
+#endif
+#ifndef IDS_TILE_STONESLAB_NETHERBRICK
+#define IDS_TILE_STONESLAB_NETHERBRICK 8760
+#endif
+#ifndef IDS_TILE_STONESLAB_OAK
+#define IDS_TILE_STONESLAB_OAK 8761
+#endif
+#ifndef IDS_TILE_STONESLAB_QUARTZ
+#define IDS_TILE_STONESLAB_QUARTZ 8762
+#endif
+#ifndef IDS_TILE_STONESLAB_SAND
+#define IDS_TILE_STONESLAB_SAND 8763
+#endif
+#ifndef IDS_TILE_STONESLAB_SMOOTHBRICK
+#define IDS_TILE_STONESLAB_SMOOTHBRICK 8764
+#endif
+#ifndef IDS_TILE_STONESLAB_SPRUCE
+#define IDS_TILE_STONESLAB_SPRUCE 8765
+#endif
+#ifndef IDS_TILE_STONESLAB_STONE
+#define IDS_TILE_STONESLAB_STONE 8766
+#endif
+#ifndef IDS_TILE_STONESLAB_WOOD
+#define IDS_TILE_STONESLAB_WOOD 8767
+#endif
+#ifndef IDS_TILE_STONE_BRICK
+#define IDS_TILE_STONE_BRICK 8768
+#endif
+#ifndef IDS_TILE_STONE_BRICK_SMOOTH
+#define IDS_TILE_STONE_BRICK_SMOOTH 8769
+#endif
+#ifndef IDS_TILE_STONE_BRICK_SMOOTH_CHISELED
+#define IDS_TILE_STONE_BRICK_SMOOTH_CHISELED 8770
+#endif
+#ifndef IDS_TILE_STONE_BRICK_SMOOTH_CRACKED
+#define IDS_TILE_STONE_BRICK_SMOOTH_CRACKED 8771
+#endif
+#ifndef IDS_TILE_STONE_BRICK_SMOOTH_MOSSY
+#define IDS_TILE_STONE_BRICK_SMOOTH_MOSSY 8772
+#endif
+#ifndef IDS_TILE_STONE_MOSS
+#define IDS_TILE_STONE_MOSS 8773
+#endif
+#ifndef IDS_TILE_STONE_SILVERFISH
+#define IDS_TILE_STONE_SILVERFISH 8774
+#endif
+#ifndef IDS_TILE_STONE_SILVERFISH_COBBLESTONE
+#define IDS_TILE_STONE_SILVERFISH_COBBLESTONE 8775
+#endif
+#ifndef IDS_TILE_STONE_SILVERFISH_STONE_BRICK
+#define IDS_TILE_STONE_SILVERFISH_STONE_BRICK 8776
+#endif
+#ifndef IDS_TILE_TALL_GRASS
+#define IDS_TILE_TALL_GRASS 8777
+#endif
+#ifndef IDS_TILE_THIN_GLASS
+#define IDS_TILE_THIN_GLASS 8778
+#endif
+#ifndef IDS_TILE_TNT
+#define IDS_TILE_TNT 8779
+#endif
+#ifndef IDS_TILE_TORCH
+#define IDS_TILE_TORCH 8780
+#endif
+#ifndef IDS_TILE_TRAPDOOR
+#define IDS_TILE_TRAPDOOR 8781
+#endif
+#ifndef IDS_TILE_TRIPWIRE
+#define IDS_TILE_TRIPWIRE 8782
+#endif
+#ifndef IDS_TILE_TRIPWIRE_SOURCE
+#define IDS_TILE_TRIPWIRE_SOURCE 8783
+#endif
+#ifndef IDS_TILE_VINE
+#define IDS_TILE_VINE 8784
+#endif
+#ifndef IDS_TILE_WATER
+#define IDS_TILE_WATER 8785
+#endif
+#ifndef IDS_TILE_WATERLILY
+#define IDS_TILE_WATERLILY 8786
+#endif
+#ifndef IDS_TILE_WEB
+#define IDS_TILE_WEB 8787
+#endif
+#ifndef IDS_TILE_WHITESTONE
+#define IDS_TILE_WHITESTONE 8788
+#endif
+#ifndef IDS_TILE_WOOD
+#define IDS_TILE_WOOD 8789
+#endif
+#ifndef IDS_TILE_WORKBENCH
+#define IDS_TILE_WORKBENCH 8790
+#endif
+#ifndef IDS_VILLAGER
+#define IDS_VILLAGER 8791
+#endif
+#ifndef IDS_VILLAGER_BUTCHER
+#define IDS_VILLAGER_BUTCHER 8792
+#endif
+#ifndef IDS_VILLAGER_FARMER
+#define IDS_VILLAGER_FARMER 8793
+#endif
+#ifndef IDS_VILLAGER_LIBRARIAN
+#define IDS_VILLAGER_LIBRARIAN 8794
+#endif
+#ifndef IDS_VILLAGER_PRIEST
+#define IDS_VILLAGER_PRIEST 8795
+#endif
+#ifndef IDS_VILLAGER_SMITH
+#define IDS_VILLAGER_SMITH 8796
+#endif
+#ifndef IDS_WOLF
+#define IDS_WOLF 8797
+#endif
+#ifndef IDS_ZOMBIE
+#define IDS_ZOMBIE 8798
+#endif
+
+#endif /* COMPAT_H */

@@ -1,0 +1,57 @@
+/* Linux/Android — auto-generated C4JRender impl. Real GLES in Phase 5+. */
+#include "stdafx.h"
+#include "Common/Consoles_App.h"
+#include "Linux/4JLibs/inc/4J_Render.h"
+
+void C4JRender::Tick() {}
+void C4JRender::MatrixMode(int) {}
+void C4JRender::MatrixSetIdentity() {}
+void C4JRender::MatrixPop() {}
+void C4JRender::MatrixPush() {}
+void C4JRender::Set_matrixDirty() {}
+void C4JRender::Initialise(IDirect3DDevice9 *) {}
+void C4JRender::InitialiseContext() {}
+void C4JRender::Present() {}
+bool C4JRender::IsWidescreen() { return false; }
+bool C4JRender::IsHiDef() { return false; }
+void C4JRender::CaptureThumbnail(LPD3DXBUFFER *) {}
+void C4JRender::CaptureScreen(LPD3DXBUFFER *, void *) {}
+void C4JRender::BeginConditionalSurvey(int) {}
+void C4JRender::EndConditionalSurvey() {}
+void C4JRender::BeginConditionalRendering(int) {}
+void C4JRender::EndConditionalRendering() {}
+void C4JRender::CBuffLockStaticCreations() {}
+int C4JRender::CBuffCreate(int) { return 0; }
+void C4JRender::CBuffStart(int) {}
+void C4JRender::CBuffClear(int) {}
+int C4JRender::CBuffSize(int) { return 0; }
+void C4JRender::CBuffTick() {}
+void C4JRender::CBuffDeferredModeStart() {}
+void C4JRender::CBuffDeferredModeEnd() {}
+int C4JRender::TextureCreate() { return 0; }
+int C4JRender::TextureGetTextureLevels() { return 0; }
+void C4JRender::TextureGetStats() {}
+void C4JRender::StateSetColour(float, float, float, float) {}
+void C4JRender::StateSetDepthMask(bool) {}
+void C4JRender::StateSetBlendEnable(bool) {}
+void C4JRender::StateSetBlendFunc(int, int) {}
+void C4JRender::StateSetFaceCull(bool) {}
+void C4JRender::StateSetFaceCullCW(bool) {}
+void C4JRender::StateSetLineWidth(float) {}
+void C4JRender::StateSetDepthTestEnable(bool) {}
+void C4JRender::StateSetAlphaTestEnable(bool) {}
+void C4JRender::StateSetDepthSlopeAndBias(float, float) {}
+void C4JRender::StateSetFogEnable(bool) {}
+void C4JRender::StateSetFogMode(int) {}
+void C4JRender::StateSetFogNearDistance(float) {}
+void C4JRender::StateSetFogFarDistance(float) {}
+void C4JRender::StateSetFogDensity(float) {}
+void C4JRender::StateSetLightingEnable(bool) {}
+void C4JRender::StateSetVertexTextureUV(float, float) {}
+void C4JRender::StateSetLightEnable(int, bool) {}
+void C4JRender::StateSetViewport(eViewportType) {}
+void C4JRender::StateSetEnableViewportClipPlanes(bool) {}
+void C4JRender::StateSetForceLOD(int) {}
+
+/* Globals */
+C4JRender RenderManager;

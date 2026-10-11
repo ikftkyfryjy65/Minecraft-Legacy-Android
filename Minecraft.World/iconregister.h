@@ -1,0 +1,1 @@
+IconRegister.h

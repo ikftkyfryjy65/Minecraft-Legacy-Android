@@ -1,0 +1,6 @@
+#ifndef MOCK_XRNM_H
+#define MOCK_XRNM_H
+/* Stub for Xbox 360 XRNM (Xbox Live Rich Network Module) */
+#include "../Minecraft.World/C4JThread.h"
+class INetworkPlayer;
+#endif

@@ -1,0 +1,98 @@
+/* Linux/Android — globals + C4JRender minimal implementation.
+ * Real implementations come in Phase 5+ (EGL/GLES). */
+
+#include "stdafx.h"
+#include "Common/Consoles_App.h"
+#include "Linux/4JLibs/inc/4J_Render.h"
+
+/* ---- C4JRender stubs (minimal, will be replaced by GLES impl) ---- */
+void C4JRender::Tick(...) {  }
+void C4JRender::UpdateGamma(...) {  }
+void C4JRender::MatrixMode(...) {  }
+void C4JRender::MatrixSetIdentity(...) {  }
+void C4JRender::MatrixTranslate(...) {  }
+void C4JRender::MatrixRotate(...) {  }
+void C4JRender::MatrixScale(...) {  }
+void C4JRender::MatrixPerspective(...) {  }
+void C4JRender::MatrixOrthogonal(...) {  }
+void C4JRender::MatrixPop(...) {  }
+void C4JRender::MatrixPush(...) {  }
+void C4JRender::MatrixMult(...) {  }
+const float* C4JRender::MatrixGet(...) { return 0; }
+void C4JRender::Set_matrixDirty(...) {  }
+void C4JRender::Initialise(...) {  }
+void C4JRender::InitialiseContext(...) {  }
+void C4JRender::Present(...) {  }
+void C4JRender::Clear(...) {  }
+void C4JRender::SetClearColour(...) {  }
+bool C4JRender::IsWidescreen(...) { return true; }
+bool C4JRender::IsHiDef(...) { return true; }
+void C4JRender::CaptureThumbnail(...) {  }
+void C4JRender::CaptureScreen(...) {  }
+void C4JRender::BeginConditionalSurvey(...) {  }
+void C4JRender::EndConditionalSurvey(...) {  }
+void C4JRender::BeginConditionalRendering(...) {  }
+void C4JRender::EndConditionalRendering(...) {  }
+void C4JRender::DrawVertices(...) {  }
+void C4JRender::DrawVertexBuffer(...) {  }
+void C4JRender::CBuffLockStaticCreations(...) {  }
+int C4JRender::CBuffCreate(...) { return 0; }
+void C4JRender::CBuffDelete(...) {  }
+void C4JRender::CBuffStart(...) {  }
+void C4JRender::CBuffClear(...) {  }
+int C4JRender::CBuffSize(...) { return 0; }
+void C4JRender::CBuffEnd(...) {  }
+bool C4JRender::CBuffCall(...) { return true; }
+void C4JRender::CBuffTick(...) {  }
+void C4JRender::CBuffDeferredModeStart(...) {  }
+void C4JRender::CBuffDeferredModeEnd(...) {  }
+int C4JRender::TextureCreate(...) { return 0; }
+void C4JRender::TextureFree(...) {  }
+void C4JRender::TextureBind(...) {  }
+void C4JRender::TextureBindVertex(...) {  }
+void C4JRender::TextureSetTextureLevels(...) {  }
+int C4JRender::TextureGetTextureLevels(...) { return 0; }
+void C4JRender::TextureData(...) {  }
+void C4JRender::TextureDataUpdate(...) {  }
+void C4JRender::TextureSetParam(...) {  }
+HRESULT C4JRender::LoadTextureData(...) { return 0; }
+HRESULT C4JRender::LoadTextureData(...) { return 0; }
+HRESULT C4JRender::SaveTextureData(...) { return 0; }
+void C4JRender::TextureGetStats(...) {  }
+void C4JRender::StateSetColour(...) {  }
+void C4JRender::StateSetDepthMask(...) {  }
+void C4JRender::StateSetBlendEnable(...) {  }
+void C4JRender::StateSetBlendFunc(...) {  }
+void C4JRender::StateSetBlendFactor(...) {  }
+void C4JRender::StateSetAlphaFunc(...) {  }
+void C4JRender::StateSetDepthFunc(...) {  }
+void C4JRender::StateSetFaceCull(...) {  }
+void C4JRender::StateSetFaceCullCW(...) {  }
+void C4JRender::StateSetLineWidth(...) {  }
+void C4JRender::StateSetWriteEnable(...) {  }
+void C4JRender::StateSetDepthTestEnable(...) {  }
+void C4JRender::StateSetAlphaTestEnable(...) {  }
+void C4JRender::StateSetDepthSlopeAndBias(...) {  }
+void C4JRender::StateSetFogEnable(...) {  }
+void C4JRender::StateSetFogMode(...) {  }
+void C4JRender::StateSetFogNearDistance(...) {  }
+void C4JRender::StateSetFogFarDistance(...) {  }
+void C4JRender::StateSetFogDensity(...) {  }
+void C4JRender::StateSetFogColour(...) {  }
+void C4JRender::StateSetLightingEnable(...) {  }
+void C4JRender::StateSetVertexTextureUV(...) {  }
+void C4JRender::StateSetLightColour(...) {  }
+void C4JRender::StateSetLightAmbientColour(...) {  }
+void C4JRender::StateSetLightDirection(...) {  }
+void C4JRender::StateSetLightEnable(...) {  }
+void C4JRender::StateSetViewport(...) {  }
+void C4JRender::StateSetEnableViewportClipPlanes(...) {  }
+void C4JRender::StateSetTexGenCol(...) {  }
+void C4JRender::StateSetForceLOD(...) {  }
+
+/* ---- Globals ---- */
+C4JRender RenderManager;
+
+/* app — declared extern in Consoles_App.h. On Linux, we instantiate here. */
+extern CMinecraftApp app;
+CMinecraftApp app;

@@ -1,0 +1,5 @@
+#ifndef MOCK_QNET_H
+#define MOCK_QNET_H
+/* Stub for QNet (4J network layer) */
+class INetworkPlayer;
+#endif

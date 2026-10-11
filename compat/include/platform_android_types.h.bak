@@ -1,0 +1,25 @@
+#ifndef PLATFORM_ANDROID_TYPES_H
+#define PLATFORM_ANDROID_TYPES_H
+
+/* Opaque Xbox LIVE / marketplace types (forward decls only) */
+struct XMARKETPLACE_CONTENTOFFER_INFO;
+typedef XMARKETPLACE_CONTENTOFFER_INFO* PXMARKETPLACE_CONTENTOFFER_INFO;
+
+struct XCONTENT_DATA;
+typedef XCONTENT_DATA* PXCONTENT_DATA;
+
+/* XUI handle (opaque) */
+typedef void* HXUIOBJ;
+
+/* Xbox invite info (opaque) */
+struct INVITE_INFO;
+typedef struct INVITE_INFO INVITE_INFO;
+
+/* Xbox friends / session info (opaque) */
+struct FriendSessionInfo;
+typedef struct FriendSessionInfo FriendSessionInfo;
+
+/* 4J thread start function (matches World/C4JThread.h) */
+typedef int (C4JThreadStartFunc)(void* lpThreadParameter);
+
+#endif /* PLATFORM_ANDROID_TYPES_H */

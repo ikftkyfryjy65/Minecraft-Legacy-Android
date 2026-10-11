@@ -1,0 +1,250 @@
+#pragma once
+/* ============================================================
+ * Linux/Android port of 4J_Render.h (copied from Xbox version).
+ * Class declaration matches Xbox exactly so callers compile.
+ * Implementation lives in Linux_Render.cpp (Phase 4).
+ * ============================================================ */
+
+/* D3D 9 constants — standard Microsoft values */
+#ifndef D3DCLEAR_TARGET
+#define D3DCLEAR_TARGET 0x00000001
+#define D3DCLEAR_ZBUFFER 0x00000002
+#define D3DCLEAR_STENCIL 0x00000004
+#endif
+#ifndef D3DPT_POINTLIST
+#define D3DPT_POINTLIST  1
+#define D3DPT_LINELIST   2
+#define D3DPT_LINESTRIP  3
+#define D3DPT_TRIANGLELIST  4
+#define D3DPT_TRIANGLESTRIP 5
+#define D3DPT_TRIANGLEFAN   6
+#define D3DPT_QUADLIST     13
+#endif
+#ifndef D3DBLEND_ZERO
+#define D3DBLEND_ZERO 1
+#define D3DBLEND_ONE 2
+#define D3DBLEND_SRCCOLOR 3
+#define D3DBLEND_INVSRCCOLOR 4
+#define D3DBLEND_SRCALPHA 5
+#define D3DBLEND_INVSRCALPHA 6
+#define D3DBLEND_DESTALPHA 7
+#define D3DBLEND_INVDESTALPHA 8
+#define D3DBLEND_DESTCOLOR 9
+#define D3DBLEND_INVDESTCOLOR 10
+#define D3DBLEND_SRCALPHASAT 11
+#define D3DBLEND_CONSTANTALPHA 17
+#define D3DBLEND_INVCONSTANTALPHA 18
+#endif
+#ifndef D3DCMP_NEVER
+#define D3DCMP_NEVER 1
+#define D3DCMP_LESS 2
+#define D3DCMP_EQUAL 3
+#define D3DCMP_LESSEQUAL 4
+#define D3DCMP_GREATER 5
+#define D3DCMP_NOTEQUAL 6
+#define D3DCMP_GREATEREQUAL 7
+#define D3DCMP_ALWAYS 8
+#endif
+
+/* D3D types — Linux uses void* placeholders */
+typedef unsigned long D3DCOLOR;
+typedef struct tagD3DRECT { long x1, y1, x2, y2; } D3DRECT;
+typedef int D3DPRIMITIVETYPE;
+class IDirect3DDevice9;
+class IDirect3DVertexBuffer9;
+class ID3DXBuffer;
+typedef ID3DXBuffer* LPD3DXBUFFER;
+
+/* GL_* constants — copied from Xbox 4J_Render.h (unique values!) */
+const int GL_MODELVIEW_MATRIX = 0;
+const int GL_PROJECTION_MATRIX = 1;
+const int GL_MODELVIEW = 0;
+const int GL_PROJECTION = 1;
+const int GL_TEXTURE = 2;
+
+const int GL_S = 0;
+const int GL_T = 1;
+const int GL_R = 2;
+const int GL_Q = 3;
+
+const int GL_TEXTURE_GEN_S = 0;
+const int GL_TEXTURE_GEN_T = 1;
+const int GL_TEXTURE_GEN_Q = 2;
+const int GL_TEXTURE_GEN_R = 3;
+
+const int GL_TEXTURE_GEN_MODE = 0;
+const int GL_OBJECT_LINEAR = 0;
+const int GL_EYE_LINEAR = 1;
+const int GL_OBJECT_PLANE = 0;
+const int GL_EYE_PLANE = 1;
+
+const int GL_TEXTURE_2D = 1;
+const int GL_BLEND = 2;
+const int GL_CULL_FACE = 3;
+const int GL_ALPHA_TEST = 4;
+const int GL_DEPTH_TEST = 5;
+const int GL_FOG = 6;
+const int GL_LIGHTING = 7;
+const int GL_LIGHT0 = 8;
+const int GL_LIGHT1 = 9;
+
+const int GL_DEPTH_BUFFER_BIT = D3DCLEAR_ZBUFFER;
+const int GL_COLOR_BUFFER_BIT = D3DCLEAR_TARGET;
+
+const int GL_QUADS = D3DPT_QUADLIST;
+const int GL_TRIANGLES = D3DPT_TRIANGLELIST;
+const int GL_LINE_STRIP = D3DPT_LINESTRIP;
+const int GL_TRIANGLE_STRIP = D3DPT_TRIANGLESTRIP;
+const int GL_TRIANGLE_FAN = D3DPT_TRIANGLEFAN;
+const int GL_LINES = D3DPT_LINELIST;
+const int GL_SRC_ALPHA = D3DBLEND_SRCALPHA;
+const int GL_ONE_MINUS_SRC_ALPHA = D3DBLEND_INVSRCALPHA;
+const int GL_ONE = D3DBLEND_ONE;
+const int GL_ZERO = D3DBLEND_ZERO;
+const int GL_DST_ALPHA = D3DBLEND_DESTALPHA;
+const int GL_SRC_COLOR = D3DBLEND_SRCCOLOR;
+const int GL_DST_COLOR = D3DBLEND_DESTCOLOR;
+const int GL_ONE_MINUS_DST_COLOR = D3DBLEND_INVDESTCOLOR;
+const int GL_ONE_MINUS_SRC_COLOR = D3DBLEND_INVSRCCOLOR;
+const int GL_CONSTANT_ALPHA = D3DBLEND_CONSTANTALPHA;
+const int GL_ONE_MINUS_CONSTANT_ALPHA = D3DBLEND_INVCONSTANTALPHA;
+
+const int GL_GREATER = D3DCMP_GREATER;
+const int GL_EQUAL = D3DCMP_EQUAL;
+const int GL_LEQUAL = D3DCMP_LESSEQUAL;
+const int GL_GEQUAL = D3DCMP_GREATEREQUAL;
+const int GL_ALWAYS = D3DCMP_ALWAYS;
+
+const int GL_TEXTURE_MIN_FILTER = 1;
+const int GL_TEXTURE_MAG_FILTER = 2;
+const int GL_TEXTURE_WRAP_S = 3;
+const int GL_TEXTURE_WRAP_T = 4;
+
+const int GL_NEAREST = 0;
+const int GL_LINEAR = 1;
+const int GL_EXP = 2;
+const int GL_NEAREST_MIPMAP_LINEAR = 0;
+
+const int GL_CLAMP = 0;
+const int GL_REPEAT = 1;
+
+const int GL_FOG_START = 1;
+const int GL_FOG_END = 2;
+const int GL_FOG_MODE = 3;
+const int GL_FOG_DENSITY = 4;
+const int GL_FOG_COLOR = 5;
+
+const int GL_POSITION = 1;
+const int GL_AMBIENT = 2;
+const int GL_DIFFUSE = 3;
+const int GL_SPECULAR = 4;
+
+const int GL_LIGHT_MODEL_AMBIENT = 1;
+
+class C4JRender
+{
+public:
+    void Tick(); void UpdateGamma(...);
+
+    void MatrixMode(int type);
+    void MatrixSetIdentity(); void MatrixTranslate(...); void MatrixRotate(...); void MatrixScale(...); void MatrixPerspective(...); void MatrixOrthogonal(...);
+    void MatrixPop();
+    void MatrixPush(); void MatrixMult(...);
+    const float *MatrixGet(int type);
+    void Set_matrixDirty();
+
+    void Initialise(IDirect3DDevice9 *pDevice);
+    void InitialiseContext();
+    void Present(); void Clear(...); void SetClearColour(...);
+    bool IsWidescreen();
+    bool IsHiDef();
+    void CaptureThumbnail(LPD3DXBUFFER *pngOut);
+    void CaptureScreen(LPD3DXBUFFER *jpgOut, void *previewOut);
+    void BeginConditionalSurvey(int identifier);
+    void EndConditionalSurvey();
+    void BeginConditionalRendering(int identifier);
+    void EndConditionalRendering();
+
+    typedef enum {
+        PRIMITIVE_TYPE_TRIANGLE_LIST,
+        PRIMITIVE_TYPE_TRIANGLE_STRIP,
+        PRIMITIVE_TYPE_TRIANGLE_FAN,
+        PRIMITIVE_TYPE_QUAD_LIST,
+        PRIMITIVE_TYPE_LINE_LIST,
+        PRIMITIVE_TYPE_LINE_STRIP
+    } ePrimitiveType;
+
+    typedef enum {
+        VERTEX_TYPE_PF3_TF2_CB4_NB4_XW1,
+        VERTEX_TYPE_COMPRESSED,
+        VERTEX_TYPE_PS3_TS2_CS1,
+        VERTEX_TYPE_PF3_TF2_CB4_NB4_XW1_LIT,
+        VERTEX_TYPE_PF3_TF2_CB4_NB4_XW1_TEXGEN,
+        VERTEX_TYPE_COUNT
+    } eVertexType;
+
+    typedef enum {
+        PIXEL_SHADER_TYPE_STANDARD,
+        PIXEL_SHADER_TYPE_PROJECTION,
+        PIXEL_SHADER_TYPE_LOD_FORCE,
+        PIXEL_SHADER_COUNT
+    } ePixelShaderType;
+
+    typedef enum {
+        VIEWPORT_TYPE_FULLSCREEN,
+        VIEWPORT_TYPE_SPLIT_TOP,
+        VIEWPORT_TYPE_SPLIT_BOTTOM,
+        VIEWPORT_TYPE_SPLIT_LEFT,
+        VIEWPORT_TYPE_SPLIT_RIGHT,
+        VIEWPORT_TYPE_QUADRANT_TOP_LEFT,
+        VIEWPORT_TYPE_QUADRANT_TOP_RIGHT,
+        VIEWPORT_TYPE_QUADRANT_BOTTOM_LEFT,
+        VIEWPORT_TYPE_QUADRANT_BOTTOM_RIGHT,
+    } eViewportType; void DrawVertices(...); void DrawVertexBuffer(...);
+
+    void CBuffLockStaticCreations();
+    int  CBuffCreate(int count); void CBuffDelete(...);
+    void CBuffStart(int index);
+    void CBuffClear(int index);
+    int  CBuffSize(int index);
+    void CBuffEnd(int vertexCount); void CBuffCall(...);
+    void CBuffTick();
+    void CBuffDeferredModeStart();
+    void CBuffDeferredModeEnd();
+
+    typedef enum {
+        TEXTURE_FORMAT_RxGyBzAw,
+        TEXTURE_FORMAT_R0G0B0Ax,
+        TEXTURE_FORMAT_R1G1B1Ax,
+        TEXTURE_FORMAT_RxGxBxAx,
+        MAX_TEXTURE_FORMATS
+    } eTextureFormat;
+
+    int TextureCreate(); void TextureFree(...); void TextureBind(...); void TextureBindVertex(...); void TextureSetTextureLevels(...);
+    int  TextureGetTextureLevels(); void TextureData(...); void TextureDataUpdate(...); void TextureSetParam(...); void LoadTextureData(...); void LoadTextureData(...); void SaveTextureData(...);
+    void TextureGetStats();
+
+    void StateSetColour(float r, float g, float b, float a);
+    void StateSetDepthMask(bool enable);
+    void StateSetBlendEnable(bool enable);
+    void StateSetBlendFunc(int src, int dst); void StateSetBlendFactor(...); void StateSetAlphaFunc(...); void StateSetDepthFunc(...);
+    void StateSetFaceCull(bool enable);
+    void StateSetFaceCullCW(bool cw);
+    void StateSetLineWidth(float width); void StateSetWriteEnable(...);
+    void StateSetDepthTestEnable(bool enable);
+    void StateSetAlphaTestEnable(bool enable);
+    void StateSetDepthSlopeAndBias(float slope, float bias);
+    void StateSetFogEnable(bool enable);
+    void StateSetFogMode(int mode);
+    void StateSetFogNearDistance(float dist);
+    void StateSetFogFarDistance(float dist);
+    void StateSetFogDensity(float density); void StateSetFogColour(...);
+    void StateSetLightingEnable(bool enable);
+    void StateSetVertexTextureUV( float u, float v); void StateSetLightColour(...); void StateSetLightAmbientColour(...); void StateSetLightDirection(...);
+    void StateSetLightEnable(int light, bool enable);
+    void StateSetViewport(eViewportType viewportType);
+    void StateSetEnableViewportClipPlanes(bool enable); void StateSetTexGenCol(...);
+    void StateSetForceLOD(int LOD);
+};
+
+extern C4JRender RenderManager;

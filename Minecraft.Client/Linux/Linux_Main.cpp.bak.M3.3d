@@ -1,0 +1,15 @@
+/* M3.3: Android entry function (loaded via dlopen) */
+#include "stdafx.h"
+#include "Minecraft.h"
+#include <string>
+
+extern void __mce_construct_app();
+
+extern "C" int __mce_run() {
+    write(2, "[mce] __mce_run entered\n", 24);
+    __mce_construct_app();
+    write(2, "[mce] app constructed, calling Minecraft::start\n", 48);
+    Minecraft::start(std::wstring(L"Player"), std::wstring(L"-"));
+    write(2, "[mce] Minecraft ended\n", 22);
+    return 0;
+}

@@ -1,0 +1,56 @@
+#ifndef COMPAT_XBOX_CONTENT_H
+#define COMPAT_XBOX_CONTENT_H
+
+/* ============================================================
+ * XContent (Xbox 360 content management: DLC, saves).
+ * Structs and enums preserved for compilation.
+ * Real implementations live in a future platform layer.
+ * ============================================================ */
+
+
+/* Content flags */
+#ifndef XCONTENTFLAG_NONE
+#define XCONTENTFLAG_NONE                  0x00000000
+#define XCONTENTFLAG_CREATEALWAYS          0x00000001
+#define XCONTENTFLAG_CREATENEW             0x00000002
+#define XCONTENTFLAG_OPENALWAYS            0x00000004
+#define XCONTENTFLAG_OPENEXISTING          0x00000008
+#define XCONTENTFLAG_TRUNCATEEXISTING      0x00000010
+#define XCONTENTFLAG_MOVEONLY_TRANSFER     0x00000100
+#define XCONTENTFLAG_ALLOWPROFILE_TRANSFER 0x00000200
+#define XCONTENTFLAG_NOPROFILE_TRANSFER    0x00000400
+#define XCONTENTFLAG_NODEVICE_TRANSFER     0x00000800
+#define XCONTENTFLAG_STRONG_SIGNED         0x00001000
+#endif
+
+/* XContent type enum */
+#ifndef XCONTENTTYPE_NONE
+enum XCONTENT_TYPE {
+    XCONTENTTYPE_NONE              = 0,
+    XCONTENTTYPE_SAVEDGAME         = 1,
+    XCONTENTTYPE_MARKETPLACE       = 2,
+    XCONTENTTYPE_PUBLISHEDGAME     = 3,
+    XCONTENTTYPE_XBOX360TITLE      = 4,
+    XCONTENTTYPE_XBOX360DLC        = 5,
+    XCONTENTTYPE_XBOX360AVATAR     = 6,
+    XCONTENTTYPE_INSTALLEDGAME     = 7,
+    XCONTENTTYPE_USERCREATEDCONTENT= 8
+};
+#endif
+
+/* Storage device id */
+typedef DWORD XCONTENTDEVICEID;
+
+/* Main content data structure */
+typedef struct _XCONTENT_DATA {
+    XCONTENTDEVICEID DeviceID;
+    unsigned int     DeviceContentType;
+    unsigned int     dwContentType;
+    char             szDisplayName[XCONTENT_MAX_DISPLAYNAME_LENGTH];
+    char             szFileName[XCONTENT_MAX_FILENAME_LENGTH];
+    WCHAR            szDisplayNameW[XCONTENT_MAX_DISPLAYNAME_LENGTH];
+    WCHAR            szFileNameW[XCONTENT_MAX_FILENAME_LENGTH];
+    BYTE             abReserved[64];
+} XCONTENT_DATA, *PXCONTENT_DATA;
+
+#endif /* COMPAT_XBOX_CONTENT_H */

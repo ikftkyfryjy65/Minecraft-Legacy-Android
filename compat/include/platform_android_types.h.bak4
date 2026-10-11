@@ -1,0 +1,112 @@
+#ifndef PLATFORM_ANDROID_TYPES_H
+#define PLATFORM_ANDROID_TYPES_H
+
+/* Opaque Xbox LIVE / marketplace types */
+struct XMARKETPLACE_CONTENTOFFER_INFO;
+typedef XMARKETPLACE_CONTENTOFFER_INFO* PXMARKETPLACE_CONTENTOFFER_INFO;
+
+struct XCONTENT_DATA;
+typedef XCONTENT_DATA* PXCONTENT_DATA;
+
+/* XUI handle (opaque) */
+typedef void* HXUIOBJ;
+
+/* Xbox invite info (opaque) */
+struct INVITE_INFO;
+typedef struct INVITE_INFO INVITE_INFO;
+
+/* Xbox friends / session info (opaque) */
+struct FriendSessionInfo;
+typedef struct FriendSessionInfo FriendSessionInfo;
+
+/* 4J thread start function (matches World/C4JThread.h) */
+typedef int (C4JThreadStartFunc)(void* lpThreadParameter);
+
+/* Xbox LIVE constants */
+#ifndef XUSER_INDEX_ANY
+#define XUSER_INDEX_ANY                     0x000000FF
+#endif
+
+#ifndef XUSER_MAX_COUNT
+#define XUSER_MAX_COUNT                     4
+#endif
+
+#ifndef XMARKETPLACE_OFFERING_TYPE_CONTENT
+#define XMARKETPLACE_OFFERING_TYPE_CONTENT  0x00000001
+#endif
+
+/* Xbox user sign-in info: full definition (used as array) */
+typedef struct XUSER_SIGNIN_INFO {
+    unsigned int dwGuestNumber;
+    unsigned long long xuid;
+    unsigned int       dwInfoFlags;
+    unsigned int       dwUserSigninState;
+    unsigned char      _opaque[192];
+#ifndef XUSER_GET_SIGNIN_INFO_OFFLINE_XUID_ONLY
+#define XUSER_GET_SIGNIN_INFO_OFFLINE_XUID_ONLY 0x00000004
+#endif
+} XUSER_SIGNIN_INFO;
+static inline unsigned int XUserGetSigninInfo(int, unsigned int, XUSER_SIGNIN_INFO*) { return 0; }
+
+#ifdef __cplusplus
+/* ============================================================
+ * C++ stubs: 4J / Xbox / Sentient types sufficient to compile
+ * ============================================================ */
+
+class C_4JProfile {
+public:
+    struct PROFILESETTINGS;
+    int  GetPrimaryPad() const { return 0; }
+    void SetPrimaryPad(int) {}
+    bool IsSignedIn(int) const { return true; }
+    bool IsSignedInLive(int) const { return true; }
+    bool IsFullVersion() const { return true; }
+    bool IsGuest(int) const { return false; }
+    bool AreXUIDSEqual(unsigned long long, unsigned long long) const { return false; }
+    void DisplayFullVersionPurchase(bool, int, const wchar_t*) {}
+    void ForceQueuedProfileWrites() {}
+    unsigned int GetChatAndContentRestrictions(int, bool, int*) { return 0; }
+    bool GetDashboardProfileSettings(int, PROFILESETTINGS*) { return false; }
+    bool GetGameDefinedProfileData(int) { return false; }
+    const wchar_t* GetGamertag(int) const { return L"Player"; }
+    bool GetLockedProfile(int) const { return false; }
+    bool ReAwardAchievements(int) { return false; }
+    void RemoveGamepadFromGame(int) {}
+    void ResetProfileProcessState() {}
+    void SetCurrentGameActivity(int, unsigned int, int) {}
+    void SetLockedProfile(int) {}
+    bool WriteToProfile(int, bool) { return true; }
+    unsigned long long getUserID(int) const { return 0; }
+    bool isConnectedToPSN(int) const { return true; }
+    bool isSignedInPSN(int) const { return true; }
+};
+struct C_4JProfile::PROFILESETTINGS {
+    unsigned char _opaque[256];
+    int  iYAxisInversion;
+    bool bSwapSticks;
+};
+
+enum eUpsellType     { eUpsellType_Undefined     = 0 };
+enum eUpsellResponse { eUpsellResponse_Undefined = 0 };
+
+enum ESen_FriendOrMatch    { eSen_FriendOrMatch_Unknown    = 0, ESen_FriendOrMatch_Undefined = 0 };
+enum ESen_CompeteOrCoop    { ESen_CompeteOrCoop_Undefined    = 0 };
+enum ESen_LevelExitStatus  { ESen_LevelExitStatus_Undefined  = 0 };
+enum ESen_MediaDestination { ESen_MediaDestination_Undefined = 0 };
+enum ESen_MediaType        { ESen_MediaType_Undefined        = 0 };
+enum ESen_UpsellID         { ESen_UpsellID_Undefined         = 0 };
+enum ESen_UpsellOutcome    { ESen_UpsellOutcome_Undefined    = 0 };
+enum ETelemetryChallenges {
+    eTelemetryChallenges_Unknown   = 0,
+    eTelemetryChallenges_None      = 0,
+    ETelemetryChallenges_Undefined = 0
+};
+#endif /* __cplusplus */
+
+
+
+
+#endif /* PLATFORM_ANDROID_TYPES_H */
+
+/* Global profile manager */
+extern C_4JProfile ProfileManager;

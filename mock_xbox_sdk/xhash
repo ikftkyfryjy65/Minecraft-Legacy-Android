@@ -1,0 +1,32 @@
+#ifndef MOCK_XHASH_H
+#define MOCK_XHASH_H
+/* Stub for Xbox 360-era MSVC <xhash> header.
+ * Provides the old hash_map / hash_set names by aliasing to modern unordered_map / unordered_set. */
+
+#include <unordered_map>
+#include <unordered_set>
+#include <functional>
+
+/* Old MSVC names (pre-C++11) */
+#ifndef _STD_BEGIN
+#  define _STD_BEGIN namespace std {
+#  define _STD_END   }
+#endif
+
+#if defined(_MSC_VER) || defined(__clang__)
+  namespace stdext {
+    template<class K, class V, class H = std::hash<K>, class E = std::equal_to<K>, class A = std::allocator<std::pair<const K, V> > >
+    using hash_map = std::unordered_map<K, V, H, E, A>;
+
+    template<class K, class H = std::hash<K>, class E = std::equal_to<K>, class A = std::allocator<K> >
+    using hash_set = std::unordered_set<K, H, E, A>;
+
+    template<class K, class V, class H = std::hash<K>, class E = std::equal_to<K>, class A = std::allocator<std::pair<const K, V> > >
+    using hash_multimap = std::unordered_multimap<K, V, H, E, A>;
+
+    template<class K, class H = std::hash<K>, class E = std::equal_to<K>, class A = std::allocator<K> >
+    using hash_multiset = std::unordered_multiset<K, H, E, A>;
+  }
+#endif
+
+#endif /* MOCK_XHASH_H */
